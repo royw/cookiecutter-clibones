@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "{{cookiecutter.project_slug}}"
+version = "{{cookiecutter.version}}"
+description = "{{cookiecutter.project_short_description}}"
+authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pathvalidate = "^3.2.0"
+loguru = "^0.7.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.3.0"
+pytest = "^8.1.1"
+tox = "^4.14.2"
+mypy = "^1.9.0"
+radon = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+main = "{{cookiecutter.project_slug}}.__main__: main"

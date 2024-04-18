@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  init:
+    cmds:
+      - poetry install
+  build:
+    cmds:
+      - poetry update
+      - poetry run python3 pre_build.py --package_dir={{cookiecutter.project_slug}}
+      - poetry run mypy {{cookiecutter.project_slug}}
+      - poetry run pytest tests
+      - poetry run black {{cookiecutter.project_slug}} tests
+      - bash -c "mkdir -p metrics"
+      - poetry run radon cc --output-file=metrics/code-complexity.out {{cookiecutter.project_slug}}/
+      - poetry run radon hal --output-file=metrics/halstead-metrics.out {{cookiecutter.project_slug}}/
+      - poetry run radon mi --output-file=metrics/maintainability-index.out {{cookiecutter.project_slug}}/
+      - poetry run radon raw --output-file=metrics/raw-metrics.out {{cookiecutter.project_slug}}/
+      - poetry run tox
+      - poetry build
+  main:
+    cmds:
+      - poetry run python3 -m {{cookiecutter.project_slug}} {{ '{{' }}.CLI_ARGS{{ '}}' }}
