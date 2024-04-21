@@ -19,6 +19,6 @@ After creating your new application skeleton, cd to the new project's directory 
 * task main       # optional run the example application
 * less README.md  # optional read the instructions ;-)
 
-Start modifying the project/__main__.py and add your application code...
+Start modifying the project/\_\_main\_\_.py and add your application code...
 
 Enjoy!
