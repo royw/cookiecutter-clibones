@@ -1,23 +1,86 @@
 version: '3'
 
 tasks:
+
   init:
+    desc: Initialize the project for using poetry
     cmds:
+      - poetry init
       - poetry install
-  build:
+      - poetry env list
+      - poetry env info
+
+  lint:
+    desc: Perform static code analysis
     cmds:
+#      - poetry run mypy src tests
+      - ruff check src tests
+
+  format:
+    desc: Check and reformat the code to a coding standard
+    cmds:
+#      - poetry run black src tests
+      - ruff format src tests
+
+  setup_env:
+    cmds:
+      # validate the pyproject.toml file
+      - poetry check
+      # update project dependencies
       - poetry update
-      - poetry run python3 pre_build.py --package_dir={{cookiecutter.project_slug}}
-      - poetry run mypy {{cookiecutter.project_slug}}
-      - poetry run pytest tests
-      - poetry run black {{cookiecutter.project_slug}} tests
-      - bash -c "mkdir -p metrics"
-      - poetry run radon cc --output-file=metrics/code-complexity.out {{cookiecutter.project_slug}}/
-      - poetry run radon hal --output-file=metrics/halstead-metrics.out {{cookiecutter.project_slug}}/
-      - poetry run radon mi --output-file=metrics/maintainability-index.out {{cookiecutter.project_slug}}/
-      - poetry run radon raw --output-file=metrics/raw-metrics.out {{cookiecutter.project_slug}}/
-      - poetry run tox
+      # install project into virtual environment
+      - poetry install
+      # check that project and tool.poetry tables are in sync
+      - poetry run python3 bin/check_pyproject_toml.py
+      # create src/{{cookiecutter.project_slug}}/__init__.py using README.py and pyproject.toml
+      - poetry run python3 bin/mk_module_init_py.py -- --package_dir src/{{cookiecutter.project_slug}}
+      # show project's environment
+      - poetry env list
+      - poetry env info
+
+  build:
+    desc: Perform normal build workflow
+    cmds:
+      - task: setup_env
+      - task: lint
+      - task: format
       - poetry build
+      - task: metrics
+      - task: tests
+      - task: version
+
+  version:
+    desc: run the project, having it return its version
+    cmds:
+      - poetry run python3 -m {{cookiecutter.project_slug}} -- --version
+
+  metrics:
+    desc: Analyze the code
+    cmds:
+      - bash -c "mkdir -p metrics"
+      - poetry run radon cc --output-file=metrics/code-complexity.out src/
+      - poetry run radon hal --output-file=metrics/halstead-metrics.out src/
+      - poetry run radon mi --output-file=metrics/maintainability-index.out src/
+      - poetry run radon raw --output-file=metrics/raw-metrics.out src/
+
+  tests:
+    desc: Test the code
+    cmds:
+      - poetry run pytest tests
+      - poetry run tox
+
+  clean:
+    desc: Remove virtual environments and generated files
+    cmds:
+      - poetry env remove --all
+      - poetry env list
+      - poetry env info
+      - rm -rf .tox
+      - rm -rf dist
+      - rm -rf metrics
+      - rm -rf tests/__pycache__
+
   main:
+    desc: Run the __main__ module code, passes arguments to the module
     cmds:
       - poetry run python3 -m {{cookiecutter.project_slug}} {{ '{{' }}.CLI_ARGS{{ '}}' }}

@@ -21,9 +21,7 @@ class InfoControl:
 
     def add_arguments(self, parser: ArgumentParser) -> ArgumentParser:
         """Use argparse commands to add arguments to the given parser."""
-        info_group = parser.add_argument_group(
-            title="Informational Commands", description=self._help["info_group"]
-        )
+        info_group = parser.add_argument_group(title="Informational Commands", description=self._help["info_group"])
 
         info_group.add_argument(
             "-v",
@@ -62,9 +60,7 @@ class InfoControl:
         """
         try:
             if self.app_package:
-                return __import__(self.app_package).__version__
+                return __import__(self.app_package).version
         except (ImportError, AttributeError):
-            logger.info(
-                f"Could not import {self.app_package}.__version__, trying deprecated version locations..."
-            )
+            logger.info(f"Could not import {self.app_package}.version")
         return InfoControl.DEFAULT_VERSION

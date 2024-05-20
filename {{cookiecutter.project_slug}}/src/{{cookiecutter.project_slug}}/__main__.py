@@ -76,9 +76,7 @@ class Settings(ApplicationSettings):
         """
         return []
 
-    def add_arguments(
-        self, parser: argparse.ArgumentParser, defaults: dict[str, str]
-    ) -> None:
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:
         """This is where you should add arguments to the parser.
 
         To add application arguments, you should override this method.
@@ -98,9 +96,7 @@ class Settings(ApplicationSettings):
         )
         return
 
-    def validate_arguments(
-        self, settings: argparse.Namespace, remaining_argv: List[str]
-    ) -> list[str]:
+    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: List[str]) -> list[str]:
         """This provides a hook for validating the settings after the parsing is completed.
 
         :param settings: the settings object returned by ArgumentParser.parse_args()

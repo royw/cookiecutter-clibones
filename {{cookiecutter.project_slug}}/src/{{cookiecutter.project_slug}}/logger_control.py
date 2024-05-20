@@ -28,9 +28,7 @@ class LoggerControl:
     def add_arguments(self, parser: ArgumentParser) -> None:
         """Use argparse commands to add arguments to the given parser."""
 
-        output_group = parser.add_argument_group(
-            title="Logging Options", description=self._help["output_group"]
-        )
+        output_group = parser.add_argument_group(title="Logging Options", description=self._help["output_group"])
 
         output_group.add_argument(
             "--loglevel",
@@ -40,13 +38,9 @@ class LoggerControl:
             help=self._help["loglevel"],
         )
 
-        output_group.add_argument(
-            "--debug", dest="debug", action="store_true", help=self._help["debug"]
-        )
+        output_group.add_argument("--debug", dest="debug", action="store_true", help=self._help["debug"])
 
-        output_group.add_argument(
-            "--quiet", dest="quiet", action="store_true", help=self._help["quiet"]
-        )
+        output_group.add_argument("--quiet", dest="quiet", action="store_true", help=self._help["quiet"])
 
         output_group.add_argument(
             "--logfile",
@@ -72,8 +66,7 @@ class LoggerControl:
             level = settings_dict["loglevel"]
             if level not in LoggerControl.VALID_LOG_LEVELS:
                 error_messages.append(
-                    f"Invalid log level {level}, "
-                    f"should be one of the following: {LoggerControl.VALID_LOG_LEVELS}"
+                    f"Invalid log level {level}, " f"should be one of the following: {LoggerControl.VALID_LOG_LEVELS}"
                 )
                 level = "INFO"
 

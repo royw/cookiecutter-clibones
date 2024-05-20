@@ -90,7 +90,9 @@ class ApplicationSettings(object):
         self.logger_control = LoggerControl()
         self.info_control = InfoControl(app_package=app_package)
 
-    def _parse_config_files(self, args: Sequence[str] | None = None) -> Tuple[
+    def _parse_config_files(
+        self, args: Sequence[str] | None = None
+    ) -> Tuple[
         argparse.ArgumentParser | None,
         list[str],
         dict,
@@ -127,14 +129,10 @@ class ApplicationSettings(object):
         """
 
         # parse any config files
-        conf_parser, config_files, defaults, remaining_argv = self._parse_config_files(
-            args=args
-        )
+        conf_parser, config_files, defaults, remaining_argv = self._parse_config_files(args=args)
         parent_parsers: Sequence = [conf_parser] + self.add_parent_parsers()
 
-        parser = argparse.ArgumentParser(
-            self.__app_name, parents=parent_parsers, description=self.__app_description
-        )
+        parser = argparse.ArgumentParser(self.__app_name, parents=parent_parsers, description=self.__app_description)
 
         if defaults:
             parser.set_defaults(**defaults)
@@ -173,9 +171,7 @@ class ApplicationSettings(object):
         return []
 
     # noinspection PyUnusedLocal
-    def add_arguments(
-        self, parser: argparse.ArgumentParser, defaults: dict[str, str]
-    ) -> None:
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:
         """
         This is where you should add arguments to the parser.
 
@@ -187,9 +183,7 @@ class ApplicationSettings(object):
         return
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def validate_arguments(
-        self, settings: argparse.Namespace, remaining_argv: list[str]
-    ) -> list[str]:
+    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]) -> list[str]:
         """
         This provides a hook for validating the settings after the parsing is completed.
 
@@ -204,9 +198,7 @@ class ApplicationSettings(object):
         """context manager enter
         :return: the settings namespace
         """
-        self._parser, self._settings, self._remaining_argv = self.parse(
-            args=self.__args
-        )
+        self._parser, self._settings, self._remaining_argv = self.parse(args=self.__args)
 
         self.logger_control.setup(self._settings)
         self.info_control.setup(self._settings)
