@@ -15,6 +15,7 @@ tasks:
     cmds:
 #      - poetry run mypy src tests
       - ruff check src tests
+      - poetry run fawltydeps --detailed --ignore-unused radon pytest-cov pytest tox fawltydeps check-pyproject mypy safety
 
   format:
     desc: Check and reformat the code to a coding standard
@@ -31,7 +32,7 @@ tasks:
       # install project into virtual environment
       - poetry install
       # check that project and tool.poetry tables are in sync
-      - poetry run python3 bin/check_pyproject_toml.py
+      - poetry run check_pyproject
       # create src/{{cookiecutter.project_slug}}/__init__.py using README.py and pyproject.toml
       - poetry run python3 bin/mk_module_init_py.py -- --package_dir src/{{cookiecutter.project_slug}}
       # show project's environment
@@ -58,15 +59,17 @@ tasks:
     desc: Analyze the code
     cmds:
       - bash -c "mkdir -p metrics"
-      - poetry run radon cc --output-file=metrics/code-complexity.out src/
-      - poetry run radon hal --output-file=metrics/halstead-metrics.out src/
-      - poetry run radon mi --output-file=metrics/maintainability-index.out src/
-      - poetry run radon raw --output-file=metrics/raw-metrics.out src/
+      - poetry run radon cc --show-complexity --json --min=A --output-file=metrics/code-complexity.json src/
+      - poetry run radon cc --show-complexity --min=A src/ -- | tail -n +1 | head -10
+#      - cat metrics/code-complexity.json | jq -r '(["CCM", "Type", "Name"] | (., map(length*"-"))), (.[].[] | [.complexity, .type, .name]) | @tsv'
+      - poetry run radon hal --json --output-file=metrics/halstead-metrics.json src/
+      - poetry run radon mi --json --output-file=metrics/maintainability-index.json src/
+      - poetry run radon raw --json --output-file=metrics/raw-metrics.json src/
 
   tests:
     desc: Test the code
     cmds:
-      - poetry run pytest tests
+      - poetry run pytest --cov-report term-missing --cov-report json:metrics/coverage.json --cov={{cookiecutter.project_slug}} tests
       - poetry run tox
 
   clean:
