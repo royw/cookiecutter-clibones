@@ -62,9 +62,9 @@ The `Settings` does have a few extra features including:
 
 ## Prerequisites
 
-* Install the task manager: [taskfile](https://taskfile.dev/)
+* Install the task manager: [Task](https://taskfile.dev/)
 * Install [Poetry](https://python-poetry.org/)
-* Optionally install pyenv-installer.  https://github.com/pyenv/pyenv-installer
+* Optionally install [pyenv-installer](https://github.com/pyenv/pyenv-installer)
   * Install dependent pythons, example:
   
     `pyenv local 3.11.9 3.12.3`
