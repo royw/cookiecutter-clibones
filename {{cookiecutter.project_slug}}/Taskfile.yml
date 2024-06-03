@@ -38,7 +38,7 @@ tasks:
       # check that project and tool.poetry tables are in sync
       - poetry run check_pyproject
       # create src/{{cookiecutter.project_slug}}/__init__.py using README.py and pyproject.toml
-      - poetry run python3 bin/mk_module_init_py.py -- --package_dir src/{{cookiecutter.project_slug}}
+      - poetry run python3 scripts/mk_module_init_py.py -- --package_dir src/{{cookiecutter.project_slug}}
       # show project's environment
       - poetry env list
       - poetry env info

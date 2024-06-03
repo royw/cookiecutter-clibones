@@ -120,7 +120,8 @@ dev = [
   "tox>=4.14.2, <5.0.0",
   "radon>=6.0.1, <7.0.0",
   "fawltydeps<0.16.0,>=0.15.0",
-  "ruff<0.5.0,>=0.4.7"
+  "ruff<0.5.0,>=0.4.7",
+  "check-pyproject@ git+https://github.com:royw/check_pyproject.git"
 ]
 test = [
   "pytest>=8.1.1, <9.0.0",
@@ -165,7 +166,9 @@ line-length = 119
 code = ["src"]  # Only search for imports under ./src
 deps = ["pyproject.toml"]  # Only look for declared dependencies here
 ignore_unused = ["radon", "pytest-cov", "pytest", "tox", "fawltydeps", "mkdocs", "mkdocstrings-python",
-  "mkdocs-literate-nav", "mkdocs-section-index", "ruff", "mkdocs-material", "mkdocs-gen-files"]
+  "mkdocs-literate-nav", "mkdocs-section-index", "ruff", "mkdocs-material", "mkdocs-gen-files",
+  "check-pyproject"
+]
 output_format = "human_detailed"  # Detailed report by default
 
 ### Poetry build system
