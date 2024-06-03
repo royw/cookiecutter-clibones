@@ -3,7 +3,7 @@ that uses [loguru](https://loguru.readthedocs.io) for logging.
 
 [Poetry](https://python-poetry.org/) and [task](https://taskfile.dev/) are used for project management.
 
-Please look at the {{cookiecutter.project_slug}}/README.md for framework details.
+Please look at the `{{cookiecutter.project_slug}}/README.md` for framework details.
 
 To create a new application using this template:
 
@@ -19,6 +19,6 @@ After creating your new application skeleton, cd to the new project's directory 
 * task main       # optional run the example application
 * less README.md  # optional read the instructions ;-)
 
-Start modifying the project/\_\_main\_\_.py and add your application code...
+Start modifying the `src/__main__.py` and add your application code...
 
 Enjoy!

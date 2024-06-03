@@ -15,6 +15,7 @@ Finally, add your application into the main() method.
 import argparse
 import atexit
 import pprint
+import sys
 
 from loguru import logger
 from time import sleep
@@ -23,6 +24,18 @@ from typing import List, Sequence
 from .application_settings import ApplicationSettings
 from .graceful_interrupt_handler import GracefulInterruptHandler
 
+# Some loguru formats to get you started, used in main()
+
+# Default loguru format for colorized output
+LOGURU_FORMAT = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "\
+                "<level>{level: <8}</level> | "\
+                "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+# removed the timestamp from the logs
+LOGURU_MEDIUM_FORMAT = "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
+# just the colorized message in the logs
+LOGURU_SHORT_FORMAT = "<level>{message}</level>"
+
+# TODO remove example application constants
 DEFAULT_COUNT = 5
 MAX_COUNT = 10
 MIN_COUNT = 1
@@ -136,6 +149,9 @@ def __example_application(settings: argparse.Namespace) -> None:
 
 def main():
     """The command line applications main function."""
+    logger.remove(None)
+    logger.add(sys.stderr, level="DEBUG", format=LOGURU_FORMAT)
+
     with Settings() as settings:
         # TODO: replace invoking the example application with your application's entry point
         __example_application(settings)

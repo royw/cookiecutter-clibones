@@ -1,29 +1,165 @@
-{{cookiecutter.project_name}}
+# {{cookiecutter.project_name}}
 
-This application used cookiecutter-clibones, a CLI application framework based on the argparse standard library 
-with loguru logging.  Poetry and task are used for project management.
+This application used [cookiecutter-clibones](https://github.com/royw/cookiecutter-clibones), a CLI application 
+framework based on the argparse standard library with loguru logging.  
+[Poetry](https://python-poetry.org/) and [taskfile](https://taskfile.dev/) are used for project 
+management.
+
+## Getting Started
+
+After creating the project with:
+ 
+    cookiecutter https://github.com/royw/cookiecutter-clibones
+
+and answering the project questions, this framework was created. To use, you need to run:
+
+    task build
+
+Next you probably ought to add the new project to version control, example:
+
+    git init .
+
+The framework is now ready for all of your good stuff.
+
+## Tasks
+
+A couple of useful commands:
+
+    task --list-all     # shows available tasks
+    less Taskfile.yml   # shows the commands that form each task.  Feel free to customize.
+    poetry lock         # for when the poetry.lock gets out of sync with pyproject.toml
+
+## Architecture
 
 The architecture used is a Settings context manager that handles all the command line and config file argument 
 definition, parsing, and validation.
 
-The application's entry point is in {{cookiecutter.project_slug}}/\_\_main\_\_.py
-In main.py there several TODOs that you will need to visit and clear.
+The application's entry point is in `{{cookiecutter.project_slug}}/__main__.py`
+In `__main.py__` there several TODOs that you will need to visit and clear.
 
-The application may be run:
-* python3 -m {{cookiecutter.project_slug}} --help
-* poetry run python3 -m {{cookiecutter.project_slug}} --help
+The application may be run with any of the following:
+
+  * `python3 -m {{cookiecutter.project_slug}} --help`
+  * `poetry run python3 -m {{cookiecutter.project_slug}} --help`
+  * `task main --help`
 
 So in general, for each command line argument you ought to:
-* optionally add an argument group to the parser in Settings.add_arguments()
-* add argument to the parser in Settings.add_arguments()
-* optionally add validation to Settings.validate_arguments()
 
-Refer to application_settings.py which implements help and logging as examples.
+* optionally add an argument group to the parser in `Settings.add_arguments()`
+* add argument to the parser in `Settings.add_arguments()`
+* optionally add validation to `Settings.validate_arguments()`
 
-The __example_application() demonstrates using a GracefulInterruptHandler to capture ^C for a main loop.
+Refer to `application_settings.py` which implements help and logging as examples.
 
-Next take a look at main.main() which demonstrates the use of the Settings context manager.  
+The `__example_application()` demonstrates using a `GracefulInterruptHandler` to capture ^C for a main loop.
 
-The Settings does have a few extra features including:
+Next take a look at `main.main()` which demonstrates the use of the Settings context manager.  
+
+The `Settings` does have a few extra features including:
+
 * config files are supported for any command arguments you want to persist.
 * standard logging setup via command line arguments.
+
+## Prerequisites
+
+* Install the task manager: [taskfile](https://taskfile.dev/)
+* Install [Poetry](https://python-poetry.org/)
+* Optionally install pyenv-installer.  https://github.com/pyenv/pyenv-installer
+  * Install dependent pythons, example:
+  
+    `pyenv local 3.11.9 3.12.3`
+
+    *Note you may need to install some libraries for the pythons to compile cleanly.* 
+    *For example on ubuntu (note I prefer `nala` over `apt`):*
+
+  `sudo nala install tk-dev libbz2-dev libreadline-dev libsqlite3-dev lzma-dev python3-tk libreadline-dev`
+
+## Usage
+
+Install the package using your favorite dev tool.  Examples:
+   
+   - `git clone git@github.com:royw/{{cookiecutter.project_slug}}.git`
+   - `cd {{cookiecutter.project_slug}}`
+   - `task init`
+   - `task build`
+   - Install check_pyproject:  `pip install dest/{{cookiecutter.project_slug}}-*.whl`
+   
+    then cd to your project and run: `{{cookiecutter.project_slug}}`
+
+## Workflows
+
+### Tasks
+
+The `Taskfile.yml` is used to build your workflow as a set of tasks.  The initial workflow is:
+
+    task clean  # removes all build artifacts (metrics, docs,...)
+    task build  # lints, formats, checks pyproject.toml, and generates metrics, performs unit tests, 
+                  performs tox testing, and creates the package.
+    task docs   # creates local documentation, starts a local server, opens the home page of the documents in a browser.
+    task main   # launches the check_pyproject_toml in the poetry environment.
+
+This is a starting off point so feel free to CRUD the tasks to fit your needs, or not even use it.
+
+### Adding a dependency
+
+When adding a dependency here's my workflow.  Always add the dependency using poetry.
+
+    poetry add --group dev some_tool
+    task build
+
+The build ought to fail as the [project] and [tool.poetry] dependencies are now out of sync.  But the
+output includes the PEP 508 dependency just added that you can copy and paste into the [project] table's
+appropriate dependency.
+
+    task build
+
+Should pass this time.
+
+## References
+
+- The [Python Packaging User Guide](https://packaging.python.org/en/latest)
+- The [pyproject.toml specification](https://pypi.python.org/pypi/pyproject.toml)
+- The [Poetry pyproject.toml metadata](https://python-poetry.org/docs/pyproject)
+
+### Build tools
+- [loguru](https://loguru.readthedocs.io) improved logging.
+- [pytest](https://docs.pytest.org) unit testing.
+- [pathvalidate](https://pathvalidate.readthedocs.io)
+- [tox](https://tox.wiki) multiple python testing. 
+- [radon](https://radon.readthedocs.io) code metrics.
+- [Ruff](https://docs.astral.sh/ruff/) an extremely fast Python linter and code formatter, written in Rust.
+- [FawltyDeps](https://github.com/tweag/FawltyDeps) FawltyDeps is a dependency checker for Python that finds 
+  undeclared and/or unused 3rd-party dependencies in your Python project.
+
+### FawltyDeps
+This tool does a great job in helping keep bloat out of your project.  There is one small issue with it,
+it does not distinguish project dependencies from dev/test/doc/... dependencies.  So you have to manually
+add any new tools to the used list in your [pyproject.toml], like:
+
+    poetry run fawltydeps --detailed --ignore-unused radon pytest-cov pytest tox fawltydeps mkdocs 
+        mkdocstrings-python mkdocs-literate-nav mkdocs-section-index ruff mkdocs-material
+
+### Documentation tools 
+After years of suffering with the complexity of sphinx and RST (the PyPA recommended documentation tool), 
+this project uses MkDocs and MarkDown.  Whoooooop!  
+ 
+***Here is a big THANK YOU to the MkDocs team, the plugin teams, and the theme teams!***
+ 
+***Fantastic!***
+ 
+Plugins do a nice job of 
+[automatic code reference](https://mkdocstrings.github.io/recipes/#automatic-code-reference-pages), 
+and a fantastic theme from the mkdocs-material team!
+
+Configuration is in the `mkdocs.yml` file and the `docs/` and `scripts/` directories.
+
+The `task docs` will build the documentation into a static site, `site/`, and run a server at http://localhost:8000/
+and open the page in your browser.
+ 
+- [MkDocs](https://www.mkdocs.org/) Project documentation with Markdown.
+- [mkdocs-gen-files](https://github.com/oprypin/mkdocs-gen-files) Plugin for MkDocs to programmatically generate documentation pages during the build
+- [mkdocs-literate-nav](https://github.com/oprypin/mkdocs-literate-nav) Plugin for MkDocs to specify the navigation in Markdown instead of YAML
+- [mkdocs-section-index](https://github.com/oprypin/mkdocs-section-index) Plugin for MkDocs to allow clickable sections that lead to an index page
+- [mkdocstrings](https://mkdocstrings.github.io/) Automatic documentation from sources, for MkDocs.
+- [catalog](https://github.com/mkdocs/catalog) Catalog of MkDocs plugins.
+- [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) Material theme.

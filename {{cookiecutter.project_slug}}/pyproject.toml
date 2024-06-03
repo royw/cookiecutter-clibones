@@ -9,11 +9,11 @@ name = "{{cookiecutter.project_slug}}"
 # TOML type: string
 # The version of the project, as defined in the Version specifier specification.
 # Users SHOULD prefer to specify already-normalized versions
-version = "0.1.1a0"
+version = "{{cookiecutter.version}}"
 
 # TOML type: string
 # The summary description of the project in one line. Tools MAY error if this includes multiple lines.
-description = "This project..."
+description = "{{cookiecutter.project_short_description}}"
 
 # TOML type: string or table
 # The full description of the project (i.e. the README).
@@ -50,15 +50,15 @@ license = {file = "LICENSE.txt"}
 # the keys must be specified in the table.
 #
 # more:  https://packaging.python.org/en/latest/specifications/pyproject-toml/#authors-maintainers
-authors = [{name = "Roy Wright", email = "roy@wright.org"}]
+authors = [{name = "{{cookiecutter.full_name}}", email = "{{cookiecutter.email}}"}]
 
 # TOML type: Array of inline tables with string keys and values
 # The “maintainers” key is similar to “authors” in that its exact meaning is open to interpretation.
-maintainers = [{name = "Roy Wright", email = "roy@wright.org"}]
+maintainers = [{name = "{{cookiecutter.full_name}}", email = "{{cookiecutter.email}}"}]
 
 # TOML type: array of strings
 # The keywords for the project.
-keywords = ["python", "CLI", "skeleton"]
+keywords = ["python", "CLI", "application"]
 
 # TOML type: array of strings
 # Trove classifiers (https://pypi.org/classifiers/) which apply to the project.
@@ -69,8 +69,7 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Natural Language :: English",
   "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3",
-  "Topic :: Software Development :: Code Generators"
+  "Programming Language :: Python :: 3"
 ]
 
 # TOML type: table with keys and values of strings
@@ -117,14 +116,24 @@ project.entry-points = {}
 [project.optional-dependencies]
 dev = [
   "pytest>=8.1.1, <9.0.0",
+  "pytest-cov<6.0.0,>=5.0.0",
   "tox>=4.14.2, <5.0.0",
   "radon>=6.0.1, <7.0.0",
-  "fawltydeps<0.16.0,>=0.15.0"
+  "fawltydeps<0.16.0,>=0.15.0",
+  "ruff<0.5.0,>=0.4.7"
 ]
 test = [
   "pytest>=8.1.1, <9.0.0",
+  "pytest-cov<6.0.0,>=5.0.0",
   "tox>=4.14.2, <5.0.0",
-  "pytest-cov>=4.1.0, <5.0.0"
+]
+docs = [
+  "mkdocs<2.0.0,>=1.6.0",
+  "mkdocstrings-python<2.0.0,>=1.10.3",
+  "mkdocs-gen-files<0.6.0,>=0.5.0",
+  "mkdocs-literate-nav<0.7.0,>=0.6.1",
+  "mkdocs-section-index<0.4.0,>=0.3.9",
+  "mkdocs-material<10.0.0,>=9.5.25"
 ]
 
 [build-system]
@@ -150,7 +159,14 @@ line-length = 119
 # Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
 # overlap with the use of a formatter, like Black, but we can override this behavior by
 # explicitly adding the rule.
-extend-select = ["E501"]
+# extend-select = ["E501"]
+
+[tool.fawltydeps]
+code = ["src"]  # Only search for imports under ./src
+deps = ["pyproject.toml"]  # Only look for declared dependencies here
+ignore_unused = ["radon", "pytest-cov", "pytest", "tox", "fawltydeps", "mkdocs", "mkdocstrings-python",
+  "mkdocs-literate-nav", "mkdocs-section-index", "ruff", "mkdocs-material", "mkdocs-gen-files"]
+output_format = "human_detailed"  # Detailed report by default
 
 ### Poetry build system
 
@@ -182,7 +198,7 @@ authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
 # The maintainers of the package. Optional
 # This is a list of maintainers and should be distinct from authors. Maintainers may contain an email and be
 # in the form name <email>.
-maintainers = ["Roy Wright <roy@wright.org>"]
+maintainers = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
 
 # A path, or list of paths corresponding to the README file(s) of the package. Optional
 # The file(s) can be of any format, but if you intend to publish to PyPI keep the recommendations for a
@@ -200,7 +216,7 @@ repository = "https://github.com/{{cookiecutter.github_username}}/{{cookiecutter
 documentation = "https://github.com/{{cookiecutter.github_username}}/{{cookiecutter.project_slug}}"
 
 # A list of keywords that the package is related to. Optional
-keywords = ['python', 'CLI', 'skeleton']
+keywords = ['python', 'CLI', 'application']
 
 # A list of PyPI trove classifiers that describe the project. Optional
 classifiers = [
@@ -245,20 +261,30 @@ pathvalidate = "^3.2.0"
 
 # You can organize your dependencies in groups to manage them in a more granular way.
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.9.0"
 radon = "^6.0.1"
 pytest = "^8.1.1"
+pytest-cov = "^5.0.0"
 tox = "^4.14.2"
 check-pyproject = {git = "git@github.com:royw/check_pyproject.git"}
 fawltydeps = "^0.15.0"
+ruff = "^0.4.7"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.1.1"
+pytest-cov = "^5.0.0"
 tox = "^4.14.2"
-pytest-cov = "^4.1"
 
 # This section describes the scripts or executables that will be installed when installing the package.
 # When a script is added or updated, run poetry install to make them available in the project’s virtualenv.
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.0"
+mkdocstrings-python = "^1.10.3"
+mkdocs-gen-files = "^0.5.0"
+mkdocs-literate-nav = "^0.6.1"
+mkdocs-section-index = "^0.3.9"
+mkdocs-material = "^9.5.25"
+
 [tool.poetry.scripts]
 main = "{{cookiecutter.project_slug}}.__main__: main"
 
