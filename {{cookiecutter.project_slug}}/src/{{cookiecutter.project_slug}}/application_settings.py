@@ -20,33 +20,36 @@ This base class adds the following features to ArgumentParser:
 
 """
 
-import os
 import argparse
+import contextlib
+import os
 import sys
-
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from configparser import ConfigParser, NoSectionError
-from typing import Sequence, Tuple
 
 from .info_control import InfoControl
 from .logger_control import LoggerControl
 
 
-class ApplicationSettings(object):
+class ApplicationSettings(ABC):
     """
     Usage::
 
         class MySettings(ApplicationSettings):
             HELP = {
-                'foo': 'the foo option',
-                'bar': 'the bar option',
+                "foo": "the foo option",
+                "bar": "the bar option",
             }
 
             def __init__(self):
-                super(MySettings, self).__init__('App Name', 'app_package', 'app_description', ['APP Section'])
+                super(MySettings, self).__init__(
+                    "App Name", "app_package", "app_description", ["APP Section"]
+                )
 
             def add_arguments(parser):
-                parser.add_argument('--foo', action='store_true', help=HELP['foo'])
-                parser.add_argument('--bar', action='store_true', help=HELP['bar'])
+                parser.add_argument("--foo", action="store_true", help=HELP["foo"])
+                parser.add_argument("--bar", action="store_true", help=HELP["bar"])
 
     Context Manager Usage::
 
@@ -82,17 +85,17 @@ class ApplicationSettings(object):
         self.__app_description = app_description
         self.__config_sections: list[str] = config_sections
         self.__config_files: list[str] = config_files or []
-        self.__args: Sequence[str] = args or sys.argv
+        self.__args: Sequence[str] = args or sys.argv[1:]
         self._parser: argparse.ArgumentParser | None = None
         self._settings: argparse.Namespace | None = None
         self._remaining_argv: list[str] = []
-
+        self.quick_exit: bool = False
         self.logger_control = LoggerControl()
         self.info_control = InfoControl(app_package=app_package)
 
     def _parse_config_files(
         self, args: Sequence[str] | None = None
-    ) -> Tuple[
+    ) -> tuple[
         argparse.ArgumentParser | None,
         list[str],
         dict,
@@ -112,16 +115,14 @@ class ApplicationSettings(object):
         config.read(config_files)
         defaults = {}
         for section in self.__config_sections:
-            try:
+            with contextlib.suppress(NoSectionError):
                 defaults.update(dict(config.items(section)))
-            except NoSectionError:
-                pass
 
         return conf_parser, config_files, defaults, remaining_argv
 
     def parse(
         self, args: Sequence[str] | None = None
-    ) -> Tuple[argparse.ArgumentParser, argparse.Namespace, list[str]]:
+    ) -> tuple[argparse.ArgumentParser, argparse.Namespace, list[str]]:
         """
         Perform the parsing of the optional config files and the command line arguments.
 
@@ -130,7 +131,7 @@ class ApplicationSettings(object):
 
         # parse any config files
         conf_parser, config_files, defaults, remaining_argv = self._parse_config_files(args=args)
-        parent_parsers: Sequence = [conf_parser] + self.add_parent_parsers()
+        parent_parsers: Sequence = [conf_parser, *self.add_parent_parsers()]
 
         parser = argparse.ArgumentParser(self.__app_name, parents=parent_parsers, description=self.__app_description)
 
@@ -143,6 +144,8 @@ class ApplicationSettings(object):
         self.add_arguments(parser, defaults)
 
         settings, leftover_argv = parser.parse_known_args(args=remaining_argv)
+        # copy quick_exit into namespace for context usage
+        setattr(settings, "quick_exit", self.quick_exit)
         settings.config_files = config_files
 
         return parser, settings, leftover_argv
@@ -161,7 +164,7 @@ class ApplicationSettings(object):
         conf_name: str = os.path.expanduser(f"~/.local/{self.__app_package}.conf")
         return [rc_name, conf_name]
 
-    # noinspection PyMethodMayBeStatic
+    @abstractmethod
     def add_parent_parsers(self) -> list[argparse.ArgumentParser]:
         """
         This is where you should add any parent parsers for the main parser.
@@ -170,8 +173,8 @@ class ApplicationSettings(object):
         """
         return []
 
-    # noinspection PyUnusedLocal
-    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:
+    @abstractmethod
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:  # noqa: ARG002
         """
         This is where you should add arguments to the parser.
 
@@ -182,8 +185,8 @@ class ApplicationSettings(object):
         """
         return
 
-    # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]) -> list[str]:
+    @abstractmethod
+    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]) -> list[str]:  # noqa: ARG002
         """
         This provides a hook for validating the settings after the parsing is completed.
 
@@ -203,22 +206,22 @@ class ApplicationSettings(object):
         self.logger_control.setup(self._settings)
         self.info_control.setup(self._settings)
 
-        # validate both the base ApplicationSettings.validate_arguments and the child's validate_arguments.
-        # combine the results which each can be either a list of error message strings or an empty list
-        error_messages: list[str] = ApplicationSettings.validate_arguments(
-            self, self._settings, self._remaining_argv
-        ) + self.validate_arguments(self._settings, self._remaining_argv)
-        for error_msg in error_messages:
-            self._parser.error(error_msg)
+        if not self._settings.quick_exit:
+            # validate both the base ApplicationSettings.validate_arguments and the child's validate_arguments.
+            # combine the results which each can be either a list of error message strings or an empty list
+            error_messages: list[str] = ApplicationSettings.validate_arguments(
+                self, self._settings, self._remaining_argv
+            ) + self.validate_arguments(self._settings, self._remaining_argv)
+            for error_msg in error_messages:
+                self._parser.error(error_msg)
 
-        self._settings.parser = self._parser
+            self._settings.parser = self._parser
         return self._settings
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
         context manager exit
         """
-        pass
 
     def help(self) -> int:
         """

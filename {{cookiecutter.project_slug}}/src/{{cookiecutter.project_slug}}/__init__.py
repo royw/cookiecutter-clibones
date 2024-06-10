@@ -1,3 +1,8 @@
+"""
+Documentation that will be shown with --longhelp goes here.
+Consider using some of your README.md.
+"""
+
 from usingversion import getattr_with_version
 
 # version      set to the application's version from the pyproject.toml file.

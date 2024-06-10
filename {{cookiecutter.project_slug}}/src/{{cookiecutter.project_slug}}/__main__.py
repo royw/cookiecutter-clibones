@@ -14,28 +14,17 @@ Finally, add your application into the main() method.
 
 import argparse
 import atexit
-import pprint
 import sys
+from pprint import pformat
 
 from loguru import logger
+
 from time import sleep
 from typing import List, Sequence
 
-from .application_settings import ApplicationSettings
-from .graceful_interrupt_handler import GracefulInterruptHandler
+from {{cookiecutter.project_slug}}.application_settings import ApplicationSettings
+from {{cookiecutter.project_slug}}.graceful_interrupt_handler import GracefulInterruptHandler
 
-# Some loguru formats to get you started, used in main()
-
-# Default loguru format for colorized output
-LOGURU_FORMAT = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "\
-                "<level>{level: <8}</level> | "\
-                "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
-# removed the timestamp from the logs
-LOGURU_MEDIUM_FORMAT = "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
-# just the colorized message in the logs
-LOGURU_SHORT_FORMAT = "<level>{message}</level>"
-
-# TODO remove example application constants
 DEFAULT_COUNT = 5
 MAX_COUNT = 10
 MIN_COUNT = 1
@@ -89,7 +78,7 @@ class Settings(ApplicationSettings):
         """
         return []
 
-    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:  # noqa: ARG002
         """This is where you should add arguments to the parser.
 
         To add application arguments, you should override this method.
@@ -107,9 +96,8 @@ class Settings(ApplicationSettings):
             default=DEFAULT_COUNT,
             help=f"How many times (0-{MAX_COUNT} to execute the example loop (default: {DEFAULT_COUNT})",
         )
-        return
 
-    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: List[str]) -> list[str]:
+    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]) -> list[str]:  # noqa: ARG002
         """This provides a hook for validating the settings after the parsing is completed.
 
         :param settings: the settings object returned by ArgumentParser.parse_args()
@@ -133,7 +121,7 @@ def __example_application(settings: argparse.Namespace) -> None:
     """
     with GracefulInterruptHandler() as handler:
         logger.debug("Executing Example Application")
-        logger.info(f"Settings: {pprint.pformat(vars(settings), indent=2)}")
+        logger.info(f"Settings: {pformat(vars(settings), indent=2)}")
 
         for iteration in range(0, settings.count):
             sleep(1)
@@ -147,14 +135,16 @@ def __example_application(settings: argparse.Namespace) -> None:
         logger.debug("Example Application Complete")
 
 
-def main():
+def main(args: list[str] | None = None) -> int:
     """The command line applications main function."""
-    logger.remove(None)
-    logger.add(sys.stderr, level="DEBUG", format=LOGURU_FORMAT)
-
-    with Settings() as settings:
+    with Settings(args=args) as settings:
+        # some info commands (--version, --longhelp) need to exit immediately
+        # after completion.  The quick_exit flag indicates if this is the case.
+        if settings.quick_exit:
+            return 0
         # TODO: replace invoking the example application with your application's entry point
         __example_application(settings)
+    return 0
 
 
 def cleanup():
@@ -165,4 +155,4 @@ def cleanup():
 
 if __name__ == "__main__":
     atexit.register(cleanup)
-    main()
+    sys.exit(main(args=None))  # pragma: no cover

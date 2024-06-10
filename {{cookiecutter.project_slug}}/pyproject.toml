@@ -171,6 +171,25 @@ ignore_unused = ["radon", "pytest-cov", "pytest", "tox", "fawltydeps", "mkdocs",
 ]
 output_format = "human_detailed"  # Detailed report by default
 
+[tool.coverage.run]
+source_pkgs = ["{{cookiecutter.project_slug}}"]
+branch = true
+parallel = true
+omit = [
+  "src/{{cookiecutter.project_slug}}/__init__.py",
+]
+
+[tool.coverage.paths]
+source = ["src/{{cookiecutter.project_slug}}"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
 ### Poetry build system
 
 [tool.poetry]
