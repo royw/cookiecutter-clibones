@@ -20,7 +20,7 @@ from pprint import pformat
 from loguru import logger
 
 from time import sleep
-from typing import List, Sequence
+from typing import Sequence
 
 from {{cookiecutter.project_slug}}.application_settings import ApplicationSettings
 from {{cookiecutter.project_slug}}.graceful_interrupt_handler import GracefulInterruptHandler
@@ -147,12 +147,12 @@ def main(args: list[str] | None = None) -> int:
     return 0
 
 
-def cleanup():
+def cleanup():  # pragma: no cover
     """Cleans up the application just before exiting."""
     # TODO: add any cleanup necessary.
     logger.debug("Cleaning up")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     atexit.register(cleanup)
-    sys.exit(main(args=None))  # pragma: no cover
+    sys.exit(main(args=None))

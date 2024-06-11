@@ -165,7 +165,7 @@ class ApplicationSettings(ABC):
         return [rc_name, conf_name]
 
     @abstractmethod
-    def add_parent_parsers(self) -> list[argparse.ArgumentParser]:
+    def add_parent_parsers(self) -> list[argparse.ArgumentParser]:  # pragma: no cover
         """
         This is where you should add any parent parsers for the main parser.
 
@@ -174,7 +174,8 @@ class ApplicationSettings(ABC):
         return []
 
     @abstractmethod
-    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:  # noqa: ARG002
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]
+                      ) -> None:  # pragma: no cover # noqa: ARG002
         """
         This is where you should add arguments to the parser.
 
@@ -186,7 +187,8 @@ class ApplicationSettings(ABC):
         return
 
     @abstractmethod
-    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]) -> list[str]:  # noqa: ARG002
+    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]
+                           ) -> list[str]:  # pragma: no cover # noqa: ARG002
         """
         This provides a hook for validating the settings after the parsing is completed.
 

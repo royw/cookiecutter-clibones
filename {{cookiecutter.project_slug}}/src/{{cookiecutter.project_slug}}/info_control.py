@@ -38,9 +38,7 @@ class InfoControl:
     def setup(self, settings: argparse.Namespace) -> None:
         """Set up the given settings.  In this case, handle the --version and --longhelp options."""
         if settings.longhelp and self.app_package:
-            app_module = importlib.import_module(self.app_package)
-            if app_module.__doc__:
-                logger.info(app_module.__doc__)
+            logger.info(self._load_longhelp())
             settings.quick_exit = True
 
         if settings.version and not settings.quick_exit:
@@ -57,6 +55,11 @@ class InfoControl:
         try:
             if self.app_package:
                 return __import__(self.app_package).version
-        except (ImportError, AttributeError):
+        except (ImportError, AttributeError, ValueError):
             logger.info(f"Could not import {self.app_package}.version")
         return InfoControl.DEFAULT_VERSION
+
+    def _load_longhelp(self) -> str:
+        if self.app_package:
+            return __import__(self.app_package).__doc__
+        return f"Long Help not available.  Please add docstring to {self.app_package}.__init__.py"
