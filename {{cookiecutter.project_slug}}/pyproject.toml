@@ -46,7 +46,7 @@ requires-python = ">=3.11"
 # pyproject.toml to the file which contains the license for the project. Tools MUST assume the file’s
 # encoding is UTF-8. The text key has a string value which is the license of the project. These keys are
 # mutually exclusive, so a tool MUST raise an error if the metadata specifies both keys.
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSES/MIT.txt"}
 
 # TOML type: Array of inline tables with string keys and values
 # The people or organizations considered to be the “authors” of the project. The exact meaning is open to
