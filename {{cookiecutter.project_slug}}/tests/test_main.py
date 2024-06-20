@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
+from __future__ import annotations
+
 from pathlib import Path
 
 import pytest
@@ -19,6 +25,7 @@ def test_main_longhelp():
 
 def test_main_help():
     # --help is handled from argparse
+    # this testing pattern from: https://dev.to/boris/testing-exit-codes-with-pytest-1g27
     with pytest.raises(SystemExit) as e:
         {{cookiecutter.project_slug}}.__main__.main(["--help"])
     assert e.type == SystemExit

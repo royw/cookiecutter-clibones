@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 """
 A context manager base class that optionally reads a config file then uses the values as defaults
 for command line argument parsing.
@@ -20,16 +24,21 @@ This base class adds the following features to ArgumentParser:
 
 """
 
+from __future__ import annotations
+
 import argparse
 import contextlib
-import os
 import sys
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from configparser import ConfigParser, NoSectionError
+from pathlib import Path
+from typing import TYPE_CHECKING
 
-from .info_control import InfoControl
-from .logger_control import LoggerControl
+from {{cookiecutter.project_slug}}.clibones.info_control import InfoControl
+from {{cookiecutter.project_slug}}.clibones.logger_control import LoggerControl
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class ApplicationSettings(ABC):
@@ -145,7 +154,7 @@ class ApplicationSettings(ABC):
 
         settings, leftover_argv = parser.parse_known_args(args=remaining_argv)
         # copy quick_exit into namespace for context usage
-        setattr(settings, "quick_exit", self.quick_exit)
+        settings.quick_exit = self.quick_exit
         settings.config_files = config_files
 
         return parser, settings, leftover_argv
@@ -161,7 +170,7 @@ class ApplicationSettings(ABC):
         :return: the set of config file locations
         """
         rc_name: str = f".{self.__app_package}rc"
-        conf_name: str = os.path.expanduser(f"~/.local/{self.__app_package}.conf")
+        conf_name: str = Path(f"~/.local/{self.__app_package}.conf").expanduser().name
         return [rc_name, conf_name]
 
     @abstractmethod
@@ -187,8 +196,9 @@ class ApplicationSettings(ABC):
         return
 
     @abstractmethod
-    def validate_arguments(self, settings: argparse.Namespace, remaining_argv: list[str]
-                           ) -> list[str]:  # pragma: no cover # noqa: ARG002
+    def validate_arguments(
+            self, settings: argparse.Namespace, remaining_argv: list[str]
+    ) -> list[str]:  # pragma: no cover # noqa: ARG002
         """
         This provides a hook for validating the settings after the parsing is completed.
 
@@ -220,7 +230,7 @@ class ApplicationSettings(ABC):
             self._settings.parser = self._parser
         return self._settings
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb):  # NOQA: B027
         """
         context manager exit
         """

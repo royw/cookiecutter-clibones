@@ -1,5 +1,12 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 .python-version
 dist/
 metrics/
+site/
 .tox/
 .coverage
+.ruff_cache/
+**/__pycache__/*.pyc

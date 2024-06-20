@@ -1,5 +1,12 @@
-""" default tests for info_control.py """
-from {{cookiecutter.project_slug}}.info_control import InfoControl
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
+"""default tests for info_control.py"""
+
+from __future__ import annotations
+
+from {{cookiecutter.project_slug}}.clibones.info_control import InfoControl
 
 
 def test_version():
@@ -27,7 +34,7 @@ def test_longhelp():
 
 
 def test_default_longhelp():
-    info_control = InfoControl(app_package=None)
+    info_control = InfoControl(app_package=".")
     longhelp: str = info_control._load_longhelp()
     assert longhelp is not None
     assert isinstance(longhelp, str)

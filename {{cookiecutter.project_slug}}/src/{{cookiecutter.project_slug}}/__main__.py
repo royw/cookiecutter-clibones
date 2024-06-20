@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 """
 This is a sample Python CLI script.  Set up command line arguments in a class derived from ApplicationSettings.
 
@@ -12,18 +16,18 @@ and then add any arguments to Settings.add_arguments() and Settings.validate_arg
 Finally, add your application into the main() method.
 """
 
+from __future__ import annotations
+
 import argparse
 import atexit
 import sys
+from collections.abc import Sequence
 from pprint import pformat
-
+from time import sleep
 from loguru import logger
 
-from time import sleep
-from typing import Sequence
-
-from {{cookiecutter.project_slug}}.application_settings import ApplicationSettings
-from {{cookiecutter.project_slug}}.graceful_interrupt_handler import GracefulInterruptHandler
+from {{cookiecutter.project_slug}}.clibones.application_settings import ApplicationSettings
+from {{cookiecutter.project_slug}}.clibones.graceful_interrupt_handler import GracefulInterruptHandler
 
 DEFAULT_COUNT = 5
 MAX_COUNT = 10
@@ -123,14 +127,14 @@ def __example_application(settings: argparse.Namespace) -> None:
         logger.debug("Executing Example Application")
         logger.info(f"Settings: {pformat(vars(settings), indent=2)}")
 
-        for iteration in range(0, settings.count):
+        for iteration in range(settings.count):
             sleep(1)
-            print(".", end="", flush=True)
+            logger.info(".", end="", flush=True)
             # to break out of loop when interrupt (^C) is pressed
             if handler.interrupted:
                 logger.error(f"Loop Interrupted after {iteration} iterations")
                 break
-        print("\n")
+        logger.info("\n")
 
         logger.debug("Example Application Complete")
 

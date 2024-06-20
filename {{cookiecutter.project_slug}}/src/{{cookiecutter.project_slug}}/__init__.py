@@ -1,9 +1,8 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 """
 Documentation that will be shown with --longhelp goes here.
 Consider using some of your README.md.
 """
-
-from usingversion import getattr_with_version
-
-# version      set to the application's version from the pyproject.toml file.
-__getattr__ = getattr_with_version("{{cookiecutter.project_slug}}", __file__, __name__)

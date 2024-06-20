@@ -1,9 +1,19 @@
-import argparse
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
+from __future__ import annotations
+
 import importlib
-from argparse import ArgumentParser
 from dataclasses import dataclass
+from importlib.metadata import version
+from typing import TYPE_CHECKING
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    import argparse
+    from argparse import ArgumentParser
 
 
 @dataclass
@@ -52,14 +62,21 @@ class InfoControl:
 
         :return: the version string or DEFAULT_VERSION
         """
-        try:
-            if self.app_package:
-                return __import__(self.app_package).version
-        except (ImportError, AttributeError, ValueError):
-            logger.info(f"Could not import {self.app_package}.version")
+        if self.app_package:
+            try:
+                return version(self.app_package)
+            except ImportError:
+                logger.warning(f"Could not get metadata for {self.app_package}")
+                try:
+                    return __import__(self.app_package).version
+                except (ImportError, AttributeError, ValueError):
+                    logger.warning(f"Could not import {self.app_package}.version")
         return InfoControl.DEFAULT_VERSION
 
     def _load_longhelp(self) -> str:
-        if self.app_package:
-            return __import__(self.app_package).__doc__
-        return f"Long Help not available.  Please add docstring to {self.app_package}.__init__.py"
+        try:
+            app_module = importlib.import_module(self.app_package)
+        except (ModuleNotFoundError, TypeError):
+            return f"Long Help not available.  Please add docstring to {self.app_package}.__init__.py"
+        else:
+            return app_module.__doc__

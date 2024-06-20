@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 """
 Graceful Interrupt Handler as a context manager.
 
@@ -9,10 +13,12 @@ From:
 * https://gist.github.com/nonZero/2907502
 """
 
+from __future__ import annotations
+
 import signal
 
 
-class GracefulInterruptHandler(object):
+class GracefulInterruptHandler:
     """
     Example Usage::
 
@@ -55,7 +61,7 @@ class GracefulInterruptHandler(object):
         self.original_handler = signal.getsignal(self.sig)
 
         # noinspection PyUnusedLocal
-        def handler(signum, frame):
+        def handler(signum, frame):  # NOQA: ARG001
             """
             signal that an interrupt has occurred.
 

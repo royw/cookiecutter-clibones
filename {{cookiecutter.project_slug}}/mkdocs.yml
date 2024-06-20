@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Roy Wright
+#
+# SPDX-License-Identifier: MIT
+
 # MkDocs markdown documentation configuration with material theme and auto API document generation.
 # scripts/gen_ref_pages.py is required for auto API generation.dev_addr
 # Also docs/index.md is a symbolic link to the project's README.md
@@ -42,23 +46,23 @@ theme:
     - yaml
 
 plugins:
-- search
-- gen-files:
-    scripts:
-    - scripts/gen_ref_pages.py
-- literate-nav:
-    nav_file: SUMMARY.md
-- section-index
-- mkdocstrings:
-    default_handler: python
-    enable_inventory: false
-    handlers:
-      python:
-        paths: [src]
-        load_external_modules: false
+  - search
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
+  - mkdocstrings:
+      default_handler: python
+      enable_inventory: false
+      handlers:
+        python:
+          paths: [src]
+          load_external_modules: false
 
 nav:
-  - About: 'index.md'
+  - About: "index.md"
   # rest of the navigation...
   # defer to gen-files + literate-nav
   - Code Reference: reference/
