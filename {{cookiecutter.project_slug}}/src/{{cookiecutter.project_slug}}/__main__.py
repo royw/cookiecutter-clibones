@@ -151,7 +151,7 @@ def main(args: list[str] | None = None) -> int:
     return 0
 
 
-def cleanup():  # pragma: no cover
+def cleanup() -> None:  # pragma: no cover
     """Cleans up the application just before exiting."""
     # TODO: add any cleanup necessary.
     logger.debug("Cleaning up")

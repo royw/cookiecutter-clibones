@@ -68,15 +68,16 @@ class InfoControl:
             except ImportError:
                 logger.warning(f"Could not get metadata for {self.app_package}")
                 try:
-                    return __import__(self.app_package).version
+                    return str(__import__(self.app_package).version)
                 except (ImportError, AttributeError, ValueError):
                     logger.warning(f"Could not import {self.app_package}.version")
         return InfoControl.DEFAULT_VERSION
 
     def _load_longhelp(self) -> str:
+        errmsg: str = f"Long Help not available.  Please add docstring to {self.app_package}.__init__.py"
         try:
-            app_module = importlib.import_module(self.app_package)
+            app_module = importlib.import_module(str(self.app_package))
         except (ModuleNotFoundError, TypeError):
-            return f"Long Help not available.  Please add docstring to {self.app_package}.__init__.py"
+            return errmsg
         else:
-            return app_module.__doc__
+            return app_module.__doc__ or errmsg

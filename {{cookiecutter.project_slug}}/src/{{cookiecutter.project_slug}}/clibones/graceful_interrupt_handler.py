@@ -16,6 +16,9 @@ From:
 from __future__ import annotations
 
 import signal
+from collections.abc import Callable
+from types import FrameType
+from typing import Any, Self
 
 
 class GracefulInterruptHandler:
@@ -40,16 +43,27 @@ class GracefulInterruptHandler:
                     break
     """
 
-    def __init__(self, sig=signal.SIGINT):
-        self.sig = sig
-        self.interrupted = False
-        self.released = False
-        self.original_handler = None
+    def __init__(self, sig: int = signal.SIGINT):
+        self.sig: int = sig
+        self.interrupted: bool = False
+        self.released: bool = False
+        self.original_handler: Callable[[int, FrameType | None], Any] | int | None = None
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         return self.capture()
 
-    def capture(self):
+    def release(self) -> bool:
+        """release the signal handler"""
+        if self.released:
+            return False
+
+        signal.signal(self.sig, self.original_handler)
+
+        self.released = True
+
+        return True
+
+    def capture(self) -> Self:
         """
         Capture the signal.  Useful when not using the "with GracefulInterruptHandler" syntax.
         :return: current GracefulInterruptHandler instance
@@ -61,7 +75,7 @@ class GracefulInterruptHandler:
         self.original_handler = signal.getsignal(self.sig)
 
         # noinspection PyUnusedLocal
-        def handler(signum, frame):  # NOQA: ARG001
+        def handler(signum: int, frame: FrameType | None) -> None:  # NOQA: ARG001
             """
             signal that an interrupt has occurred.
 
@@ -76,16 +90,5 @@ class GracefulInterruptHandler:
         return self
 
     # noinspection PyUnusedLocal,PyShadowingBuiltins
-    def __exit__(self, type, value, tb):
+    def __exit__(self, *exc: Any) -> None:
         self.release()
-
-    def release(self):
-        """release the signal handler"""
-        if self.released:
-            return False
-
-        signal.signal(self.sig, self.original_handler)
-
-        self.released = True
-
-        return True

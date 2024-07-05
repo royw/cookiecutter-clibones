@@ -32,7 +32,7 @@ import sys
 from abc import ABC, abstractmethod
 from configparser import ConfigParser, NoSectionError
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from {{cookiecutter.project_slug}}.clibones.info_control import InfoControl
 from {{cookiecutter.project_slug}}.clibones.logger_control import LoggerControl
@@ -105,9 +105,9 @@ class ApplicationSettings(ABC):
     def _parse_config_files(
         self, args: Sequence[str] | None = None
     ) -> tuple[
-        argparse.ArgumentParser | None,
+        argparse.ArgumentParser,
         list[str],
-        dict,
+        dict[str, Any],
         list[str],
     ]:
         config_parser_help = f"Configuration file in INI format (default: {self._default_config_files()})"
@@ -140,7 +140,7 @@ class ApplicationSettings(ABC):
 
         # parse any config files
         conf_parser, config_files, defaults, remaining_argv = self._parse_config_files(args=args)
-        parent_parsers: Sequence = [conf_parser, *self.add_parent_parsers()]
+        parent_parsers: Sequence[argparse.ArgumentParser] = [conf_parser, *self.add_parent_parsers()]
 
         parser = argparse.ArgumentParser(self.__app_name, parents=parent_parsers, description=self.__app_description)
 
@@ -183,8 +183,7 @@ class ApplicationSettings(ABC):
         return []
 
     @abstractmethod
-    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]
-                      ) -> None:  # pragma: no cover # noqa: ARG002
+    def add_arguments(self, parser: argparse.ArgumentParser, defaults: dict[str, str]) -> None:  # pragma: no cover
         """
         This is where you should add arguments to the parser.
 
@@ -197,8 +196,8 @@ class ApplicationSettings(ABC):
 
     @abstractmethod
     def validate_arguments(
-            self, settings: argparse.Namespace, remaining_argv: list[str]
-    ) -> list[str]:  # pragma: no cover # noqa: ARG002
+        self, settings: argparse.Namespace, remaining_argv: list[str]
+    ) -> list[str]:  # pragma: no cover
         """
         This provides a hook for validating the settings after the parsing is completed.
 
@@ -230,7 +229,7 @@ class ApplicationSettings(ABC):
             self._settings.parser = self._parser
         return self._settings
 
-    def __exit__(self, exc_type, exc_val, exc_tb):  # NOQA: B027
+    def __exit__(self, *exc: Any) -> None:  # NOQA: B027
         """
         context manager exit
         """
