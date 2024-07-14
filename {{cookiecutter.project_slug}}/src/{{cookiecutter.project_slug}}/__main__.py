@@ -18,20 +18,25 @@ Finally, add your application into the main() method.
 
 from __future__ import annotations
 
-import argparse
 import atexit
 import sys
 from collections.abc import Sequence
 from pprint import pformat
 from time import sleep
+from typing import TYPE_CHECKING
+
 from loguru import logger
 
 from {{cookiecutter.project_slug}}.clibones.application_settings import ApplicationSettings
 from {{cookiecutter.project_slug}}.clibones.graceful_interrupt_handler import GracefulInterruptHandler
 
+if TYPE_CHECKING:
+    import argparse
+    from collections.abc import Sequence
+
 DEFAULT_COUNT = 5
 MAX_COUNT = 10
-MIN_COUNT = 1
+MIN_COUNT = 0
 
 
 # noinspection PyMethodMayBeStatic
@@ -71,9 +76,10 @@ class Settings(ApplicationSettings):
             app_name=Settings.__project_name,
             app_package=Settings.__project_package,
             app_description=Settings.__project_description,
-            config_sections=[Settings.__project_name],
+            config_sections=[Settings.__project_package],
             args=args,
         )
+        self.add_persist_keys({"pyproject_toml_files", "loglevel", "debug"})
 
     def add_parent_parsers(self) -> list[argparse.ArgumentParser]:
         """This is where you should add any parent parsers for the main parser.

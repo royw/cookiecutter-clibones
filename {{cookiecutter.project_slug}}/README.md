@@ -1,5 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2024 Roy Wright
+
 SPDX-License-Identifier: MIT
 -->
 
@@ -8,40 +9,46 @@ SPDX-License-Identifier: MIT
 [![PyPI - Version](https://img.shields.io/pypi/v/{{cookiecutter.project_slug}}.svg)](https://pypi.org/project/{{cookiecutter.project_slug}})
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/{{cookiecutter.project_slug}}.svg)](https://pypi.org/project/{{cookiecutter.project_slug}})
 
------
+---
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Getting Started](#getting-started)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Workflows](#workflows)
-  - [Tasks](#tasks)
-  - [Switching between Poetry and Hatch](#switching-between-poetry-and-hatch) 
-  - [Adding a dependency using poetry](#adding-a-dependency-using-poetry)
-  - [Adding a dependency using hatch](#adding-a-dependency-using-hatch)
-- [License](#license)
-- [References](#references)
-  - [Build tools](#build-tools)
-    - [FawltyDeps](#fawltydeps)
-  - [Documentation tools](#documentation-tools)
+<!-- TOC -->
+* [{{cookiecutter.project_name}}](#cookiecutterproject_name)
+  * [Table of Contents](#table-of-contents)
+  * [Overview](#overview)
+  * [Getting Started](#getting-started)
+  * [Architecture](#architecture)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Workflows](#workflows)
+    * [Tasks](#tasks)
+    * [Switching between Poetry and Hatch](#switching-between-poetry-and-hatch)
+    * [Adding a dependency using poetry](#adding-a-dependency-using-poetry)
+    * [Adding a dependency using hatch](#adding-a-dependency-using-hatch)
+  * [License](#license)
+  * [References](#references)
+    * [Build tools](#build-tools)
+      * [FawltyDeps](#fawltydeps)
+    * [Documentation tools](#documentation-tools)
+<!-- TOC -->
 
 ## Overview
 
-This application used [cookiecutter-clibones](https://github.com/royw/cookiecutter-clibones), a CLI application 
-framework based on the argparse standard library with loguru logging.  
-[Poetry](https://python-poetry.org/) and [taskfile](https://taskfile.dev/) are used for project 
-management.
+This application used
+[cookiecutter-clibones](https://github.com/royw/cookiecutter-clibones), a CLI
+application framework based on the argparse standard library with loguru
+logging. [Poetry](https://python-poetry.org/) and
+[taskfile](https://taskfile.dev/) are used for project management.
 
 ## Getting Started
 
 After creating the project with:
- 
+
     cookiecutter https://github.com/royw/cookiecutter-clibones
 
-and answering the project questions, this framework was created. To use, you need to run:
+and answering the project questions, this framework was created. To use, you
+need to run:
 
     task build
 
@@ -59,67 +66,72 @@ A couple of useful commands:
 
 ## Architecture
 
-The architecture used is a Settings context manager that handles all the command line and config file argument 
-definition, parsing, and validation.
+The architecture used is a Settings context manager that handles all the command
+line and config file argument definition, parsing, and validation.
 
-The application's entry point is in `{{cookiecutter.project_slug}}/__main__.py`
-In `__main.py__` there several TODOs that you will need to visit and clear.
+The application's entry point is in `{{cookiecutter.project_slug}}/__main__.py`.  In `__main.py__` there
+several TODOs that you will need to visit and clear.
 
 The application may be run with any of the following:
 
-  * `python3 -m {{cookiecutter.project_slug}} --help`
-  * `poetry run python3 -m {{cookiecutter.project_slug}} --help`
-  * `task main --help`
+- `python3 -m {{cookiecutter.project_slug}} --help`
+- `poetry run python3 -m {{cookiecutter.project_slug}} --help`
+- `task main --help`
 
 So in general, for each command line argument you ought to:
 
-* optionally add an argument group to the parser in `Settings.add_arguments()`
-* add argument to the parser in `Settings.add_arguments()`
-* optionally add validation to `Settings.validate_arguments()`
+- optionally add an argument group to the parser in `Settings.add_arguments()`
+- add argument to the parser in `Settings.add_arguments()`
+- optionally add validation to `Settings.validate_arguments()`
 
-Refer to `application_settings.py` which implements help and logging as examples.
+Refer to `application_settings.py` which implements help and logging as
+examples.
 
-The `__example_application()` demonstrates using a `GracefulInterruptHandler` to capture ^C for a main loop.
+The `__example_application()` demonstrates using a `GracefulInterruptHandler` to
+capture ^C for a main loop.
 
-Next take a look at `main.main()` which demonstrates the use of the Settings context manager.  
+Next take a look at `main.main()` which demonstrates the use of the Settings
+context manager.
 
 The `Settings` does have a few extra features including:
 
-* config files are supported for any command arguments you want to persist.
-* standard logging setup via command line arguments.
+- config files are supported for any command arguments you want to persist.
+- standard logging setup via command line arguments.
 
 ## Prerequisites
 
-* Install the task manager: [Task](https://taskfile.dev/)
-* Optionally install [Poetry](https://python-poetry.org/)
-* Optionally install [Hatch](https://hatch.pypa.io/)
-* Optionally install [pyenv-installer](https://github.com/pyenv/pyenv-installer)
-  * Install dependent pythons, example:
-  
+- Install the task manager: [Task](https://taskfile.dev/)
+- Optionally install [Poetry](https://python-poetry.org/)
+- Optionally install [Hatch](https://hatch.pypa.io/)
+- Optionally install [pyenv-installer](https://github.com/pyenv/pyenv-installer)
+
+  - Install dependent pythons, example:
+
     `pyenv local 3.11.9 3.12.3`
 
-_Note you may need to install some libraries for the pythons to compile 
+_Note you may need to install some libraries for the pythons to compile
 cleanly._ _For example on ubuntu (note I prefer `nala` over `apt`):_
 
-  `sudo nala install tk-dev libbz2-dev libreadline-dev libsqlite3-dev lzma-dev python3-tk libreadline-dev`
+`sudo nala install tk-dev libbz2-dev libreadline-dev libsqlite3-dev lzma-dev python3-tk libreadline-dev`
 
 ## Installation
 
-Install the package using your favorite dev tool.  Examples:
+Install the package using your favorite dev tool. Examples:
 
-   - `git clone git@github.com:royw/{{cookiecutter.project_slug}}.git`
-   - `cd {{cookiecutter.project_slug}}`
-   - `git init .`
-   - `git add .`
-   - `git commit -m "initial clibones cookie"`
-   - `task init`
-   - `task build`
-   - Install {{cookiecutter.project_slug}}:  `pip install dest/{{cookiecutter.project_slug}}-*.whl`
+- `git clone git@github.com:royw/{{cookiecutter.project_slug}}.git`
+- `cd {{cookiecutter.project_slug}}`
+- `git init .`
+- `git add .`
+- `git commit -m "initial clibones cookie"`
+- `task init`
+- `task build`
+- Install {{cookiecutter.project_slug}}:  `pip install dest/{{cookiecutter.project_slug}}-*.whl`
 
 then cd to your project and run: `{{cookiecutter.project_slug}}`
 
-_Note, if you do not initialize git in the new project and add at least the .gitignore file, 
-then `reuse` will be unable to honor `.gitignore` and will spew a few errors, causing the build to fail._
+_Note, if you do not initialize git in the new project and add at least the
+.gitignore file, then `reuse` will be unable to honor `.gitignore` and will spew
+a few errors, causing the build to fail._
 
 ## Workflows
 
@@ -144,11 +156,11 @@ Two tasks support switching the build system:
     task switch-to-poetry
     task switch-to-hatch
 
-They set the symbolic link for `Taskfile.yml` to either `Taskfile-poetry.yml`
-or `Taskfile-hatch.yml`.
- 
-And they edit the `build-system` table in the `pyproject.toml` file to
-the appropriate back-end.
+They set the symbolic link for `Taskfile.yml` to either `Taskfile-poetry.yml` or
+`Taskfile-hatch.yml`.
+
+And they edit the `build-system` table in the `pyproject.toml` file to the
+appropriate back-end.
 
 ### Adding a dependency using poetry
 
@@ -157,9 +169,9 @@ Add the dependency using the poetry CLI.
     poetry add --group dev some_tool
     task build
 
-The build ought to fail as the [project] and [tool.poetry] dependencies are now out of sync.  But the
-output includes the PEP 508 dependency just added that you can copy and paste into the [project] table's
-appropriate dependency.
+The build ought to fail as [project] and [tool.poetry] dependencies are now out
+of sync. But the output includes the PEP 508 dependency just added that you can
+copy and paste into the [project] table's appropriate dependency.
 
     task build
 
@@ -167,22 +179,23 @@ Should pass this time.
 
 ### Adding a dependency using hatch
 
-Manually edit the `pyproject.toml` file and add the dependency to both the [project] and [tool.poetry] dependency tables.
-Then running
+Manually edit the `pyproject.toml` file and add the dependency to both [project]
+and [tool.poetry] dependency tables. Then running
 
     task build
 
 Will show any version specifier mismatches...
 
-
 ## License
 
-`{{cookiecutter.project_slug}}` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+`{{cookiecutter.project_slug}}` is distributed under the terms of the
+[MIT](https://spdx.org/licenses/MIT.html) license.
 
 ## References
 
 - The [Python Packaging User Guide](https://packaging.python.org/en/latest)
-- The [pyproject.toml specification](https://pypi.python.org/pypi/pyproject.toml)
+- The
+  [pyproject.toml specification](https://pypi.python.org/pypi/pyproject.toml)
 - The [Poetry pyproject.toml metadata](https://python-poetry.org/docs/pyproject)
 - [pip documentation](https://pip.pypa.io/en/stable/)
 - [Setuptools](https://setuptools.pypa.io/)
@@ -194,13 +207,14 @@ Will show any version specifier mismatches...
 - [pathvalidate](https://pathvalidate.readthedocs.io)
 - [tox](https://tox.wiki) multiple python testing.
 - [radon](https://radon.readthedocs.io) code metrics.
-- [Ruff](https://docs.astral.sh/ruff/) is an extremely fast Python linter and code formatter, written 
-  in Rust.
-- [FawltyDeps](https://github.com/tweag/FawltyDeps) is a dependency checker 
-  for Python that finds undeclared and/or unused 3rd-party dependencies in 
-  your Python project.
-- [Reuse](https://reuse.readthedocs.io/) is a tool for compliance with the 
+- [Ruff](https://docs.astral.sh/ruff/) is an extremely fast Python linter and
+  code formatter, written in Rust.
+- [FawltyDeps](https://github.com/tweag/FawltyDeps) is a dependency checker for
+  Python that finds undeclared and/or unused 3rd-party dependencies in your
+  Python project.
+- [Reuse](https://reuse.readthedocs.io/) is a tool for compliance with the
   [REUSE](https://reuse.software/) recommendations.
+- [MyPy](https://www.mypy-lang.org/)
 
 #### FawltyDeps
 
