@@ -142,8 +142,8 @@ Let's start with just running task:
     * tests:                  Run the unit tests for the supported versions of python.
     * version:                Run the project, having it return its version.
 
-Cool, so looking over the list I'd guess the first thing I ought to do after creating the project
-using cookiecutter is to initialize it:
+Cool, so looking over the list I'd guess the first thing I ought to do after
+creating the project using cookiecutter is to initialize it:
 
     ➤ task init
 
@@ -160,8 +160,8 @@ Seriously, to start a new project:
 5. optionally: task switch-to-hatch
 6. ...
 
-Now the build task is the main rinse and repeat task, i.e., build it,
-correct errors, build it,...
+Now the build task is the main rinse and repeat task, i.e., build it, correct
+errors, build it,...
 
 But say I prefer hatch, it is easy to switch:
 
@@ -171,8 +171,9 @@ and to switch back to poetry with:
 
     ➤ task switch-to-poetry
 
-Note, the editing of the pyproject.toml file to support the switch tasks is in `scripts/swap_build_system.py`.
- 
+Note, the editing of the pyproject.toml file to support the switch tasks is in
+`scripts/swap_build_system.py`.
+
 So now the project is building clean, whoooop! Before proceeding, let's take a
 look at what the build task does:
 
@@ -198,7 +199,8 @@ look at what the build task does:
      - Task: build-docs
      - Task: version
 
-Let's remove the switch tasks discussed above and the tasks ran by build from the available task list:
+Let's remove the switch tasks discussed above and the tasks ran by build from
+the available task list:
 
     * check-pyproject:        Check the consistency between poetry and hatch in the pyproject.toml file.
     * clean:                  Remove virtual environments and generated files.
@@ -220,23 +222,23 @@ by pre-commit in the build task.
     commands:
      - Task: check-pyproject
 
-Both the tests and coverage tasks run pytest for each of the supported python versions.  The difference
-is for the coverage task, coverage generating options are passed to pytest while for the tests task, they
-are not.
+Both the tests and coverage tasks run pytest for each of the supported python
+versions. The difference is for the coverage task, coverage generating options
+are passed to pytest while for the tests task, they are not.
 
     ➤ task coverage --summary
     task: coverage
-    
+
     Run the unit tests with coverage.
-    
+
     commands:
      - hatch run -- test:pytest --cov-report term-missing --cov-report json:metrics/coverage.json --cov=foobar tests
 
     ➤ task tests --summary
     task: tests
-    
+
     Run the unit tests for the supported versions of python.
-    
+
     commands:
      - hatch run -- test:test
 
@@ -247,8 +249,9 @@ Removing the tests, coverage, and pre-commit tasks from the available task list:
     * main:                   Run the __main__ module code, passing arguments to the module.  Example: task main -- --version
     * serve-docs:             Start the documentation server and open browser at localhost:8000.
 
-The clean task is pretty self-evident. If you want a totally clean environment, then running clean 
-followed by a switch-to-_ task or the build task will do the job:
+The clean task is pretty self-evident. If you want a totally clean environment,
+then running clean followed by a switch-to-\_ task or the build task will do the
+job:
 
     ➤ task clean
     ➤ task switch-to-poetry
@@ -425,14 +428,14 @@ coverage.
 
 ### lint
 
-I'm a big fan of letting the computer find my issues, yes I like linters.  So there are
-a few linters in the lint task, some of which overlap.
+I'm a big fan of letting the computer find my issues, yes I like linters. So
+there are a few linters in the lint task, some of which overlap.
 
     ➤ task lint --summary
     task: lint
-    
+
     Perform static code analysis.
-    
+
     commands:
      - poetry run -- ruff check --config pyproject.toml --fix src tests
      - poetry run -- scripts/run-mypy-all-python-versions.sh
@@ -442,19 +445,20 @@ a few linters in the lint task, some of which overlap.
      - scripts/fail_on_regex_match.sh "PyBind|Numpy|Cmake|CCache|Github|PyTest"
      - git ls-files -z -- "*.sh" | xargs -0 poetry run -- shellcheck
 
-Note the use of two scripts.  `scripts/run-mypy-all-python-versions.sh` and `scripts/fail_on_regex_match.sh`.
-Both replace or mimic pre-commit tasks. 
+Note the use of two scripts. `scripts/run-mypy-all-python-versions.sh` and
+`scripts/fail_on_regex_match.sh`. Both replace or mimic pre-commit tasks.
 
 #### run-mypy-all-python-versions.sh
 
-The default mypy pre-commit task requires hard-coding the python version in the `.pre-commit-config.yaml`
-file.  So created `scripts/run-mypy-all-python-versions.sh` script that runs mypy for each python major.minor
-version in the .python-version file which is controlled by pyenv.
+The default mypy pre-commit task requires hard-coding the python version in the
+`.pre-commit-config.yaml` file. So created
+`scripts/run-mypy-all-python-versions.sh` script that runs mypy for each python
+major.minor version in the .python-version file which is controlled by pyenv.
 
 #### fail_on_refex_match.sh
 
-This is a simple test that searches for some common capitalization mistakes.  The intent is to find these
-problems in the build task instead of in the pre-commit.
+This is a simple test that searches for some common capitalization mistakes. The
+intent is to find these problems in the build task instead of in the pre-commit.
 
 ### mkdocs
 
@@ -464,8 +468,8 @@ Also by default the project's API is documented in the **code reference**
 section using the code's docstrings. The HTML output is written to `site/`
 directory.
 
-Note that `scripts/gen_ref_pages.py` supports automatic API generation and
-is used in `mkdocs.yml`.
+Note that `scripts/gen_ref_pages.py` supports automatic API generation and is
+used in `mkdocs.yml`.
 
 While the default documentation is simple, it should suffice for most simple
 projects and is easily expandable for more complex projects.

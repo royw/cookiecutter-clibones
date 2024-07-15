@@ -109,7 +109,7 @@ tasks:
       - poetry build
       # install current build into dev virtual environment
       - task: update-venv
-      # generate code metrics
+      # check licenses
       - task: check-licenses
       # run unit test and generate coverage reports
       - task: coverage
@@ -131,8 +131,8 @@ tasks:
       - bash -c "mkdir -p metrics"
       - poetry run -- radon cc --show-complexity --json --min=A
         --output-file=metrics/code-complexity.json src/
-      - poetry run -- radon cc --show-complexity --min=A src/ -- | tail -n +1 |
-        head -10
+      - poetry run -- cat metrics/code-complexity.json |
+        scripts/metrics_cc_filter.py | head -n 20
       - poetry run -- radon hal --json
         --output-file=metrics/halstead-metrics.json src/
       - poetry run -- radon mi --json
