@@ -119,18 +119,12 @@ Install the package using your favorite dev tool. Examples:
 
 - `git clone git@github.com:royw/{{cookiecutter.project_slug}}.git`
 - `cd {{cookiecutter.project_slug}}`
-- `git init .`
-- `git add .`
-- `git commit -m "initial clibones cookie"`
 - `task init`
 - `task build`
-- Install {{cookiecutter.project_slug}}:  `pip install dest/{{cookiecutter.project_slug}}-*.whl`
 
-then cd to your project and run: `{{cookiecutter.project_slug}}`
-
-_Note, if you do not initialize git in the new project and add at least the
-.gitignore file, then `reuse` will be unable to honor `.gitignore` and will spew
-a few errors, causing the build to fail._
+_Note, `task init` will run `git init .`, `git add` the initial project files, and 
+do a `git commit`. If you are using another VCS, please first edit the init task in
+the `Taskfile-*.yml` files._
 
 ## Workflows
 
