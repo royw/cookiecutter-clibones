@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 ## Table of Contents
 
 <!-- TOC -->
-* [{{cookiecutter.project_name}}](#cookiecutterproject_name)
+* [{{cookiecutter.project_name}}](#{{cookiecutter.project_name}})
   * [Table of Contents](#table-of-contents)
   * [Overview](#overview)
   * [Getting Started](#getting-started)
@@ -49,11 +49,8 @@ After creating the project with:
 and answering the project questions, this framework was created. To use, you
 need to run:
 
+    task init
     task build
-
-Next you probably ought to add the new project to version control, example:
-
-    git init .
 
 The framework is now ready for all of your good stuff.
 
