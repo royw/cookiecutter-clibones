@@ -66,7 +66,7 @@ The architecture used is a Settings context manager that handles all the command
 line and config file argument definition, parsing, and validation.
 
 The application's entry point is in `{{cookiecutter.project_slug}}/__main__.py`.  In `__main.py__` there
-several TODOs that you will need to visit and clear.
+are several TODOs that you will need to visit and clear.
 
 The application may be run with any of the following:
 
@@ -119,9 +119,9 @@ Install the package using your favorite dev tool. Examples:
 - `task init`
 - `task build`
 
-_Note, `task init` will run `git init .`, `git add` the initial project files, and 
-do a `git commit`. If you are using another VCS, please first edit the init task in
-the `Taskfile-*.yml` files._
+_Note, `task init` will run `git init .`, `git add` the initial project files,
+and do a `git commit`. If you are using another VCS, please first edit the init
+task in the `Taskfile-*.yml` files._
 
 ## Workflows
 
