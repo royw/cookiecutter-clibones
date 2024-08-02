@@ -5,29 +5,12 @@
 version: "3"
 
 includes:
+  # "fe" stands for "front end"
   fe: taskfiles/front-end.yaml
-
-vars:
-  DEFAULT_RUNNER: "{{.fe.DEFAULT_RUNNER}}"
-  DEV_RUNNER: "{{.fe.DEV_RUNNER}}"
-  DOCS_RUNNER: "{{.fe.DOCS_RUNNER}}"
-  TEST_RUNNER: "{{.fe.TEST_RUNNER}}"
-  METRICS_RUNNER: "{{.fe.METRICS_RUNNER}}"
-  SPHINX_RUNNER: "{{.fe.SPHINX_RUNNER}}"
-
-  AUTHOR:
-    sh:
-      "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
-      project.authors[0].name"
-
-  LICENSE:
-    sh:
-      '{{.DEV_RUNNER}} toml get --toml-path pyproject.toml project.license.file
-      | grep -Po "([^/]+)(?=\.txt)"'
-
-  REUSE_ENABLED:
-    sh:
-      "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml tool.taskfile.reuse"
+  hatch: taskfiles/hatch.yaml
+  poetry: taskfiles/poetry.yaml
+  setuptools: taskfiles/setuptools.yaml
+  variables: taskfiles/front-end-vars.yaml
 
 tasks:
   default:
@@ -40,7 +23,8 @@ tasks:
       - git init .
       - git add docs LICENSES scripts src tests .gitignore
         .pre-commit-config.yaml DEV-README.md mkdocs.yml pyproject.toml
-        README.md Taskfile.yaml taskfiles/hatch.yaml taskfiles/poetry.yaml tox.ini
+        README.md Taskfile.yaml taskfiles/hatch.yaml taskfiles/poetry.yaml
+        tox.ini
       # Realizing the template can mess up formatting of the files
       - pre-commit run blacken-docs --all-files >/dev/null || true
       - pre-commit run trailing-whitespace --all-files >/dev/null || true
@@ -49,6 +33,7 @@ tasks:
       - git commit -m "Initial Framework."
       - pre-commit install
       - task: reuse-enable
+      - task: fe:make-venv
       - task: fe:update-venv
     status:
       # do not run the init task if there is a .git/ directory
@@ -74,19 +59,31 @@ tasks:
     desc:
       'Perform reuse checks if pyproject.toml: tools.taskfile.reuse is set to
       "enabled"'
+    vars:
+      AUTHOR:
+        sh:
+          "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
+          project.authors[0].name"
+
+      LICENSE:
+        sh:
+          '{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
+          project.license.file | grep -Po "([^/]+)(?=\.txt)"'
+
+      REUSE_ENABLED:
+        sh:
+          "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
+          tool.taskfile.reuse"
+
     cmds:
-      - 'find . -name "requirements*.txt" -exec {{.DEV_RUNNER}} reuse annotate --copyright "{{.AUTHOR}}" --license
-        "{{.LICENSE}}" --force-dot-license --skip-existing "{}" \; | grep "Successfully" || true'
+      - 'find . -name "requirements*.txt" -exec {{.DEV_RUNNER}} reuse annotate
+        --copyright "{{.AUTHOR}}" --license "{{.LICENSE}}" --force-dot-license
+        --skip-existing "{}" \; | grep "Successfully" || true'
       - "{{.DEV_RUNNER}} reuse lint"
     status:
       # if return is false, run the above commands
-      - $( ! $( $(test "{{.REUSE_ENABLED}}" = "enabled") && [[ $(ls -1 requirements*.txt **/requirements*.txt 2>/dev/null | wc -l) > 0 ]] ) )
-
-
-  #  validate-pyproject:
-  #    cmds:
-  #      # [private] validate the pyproject.toml file
-  #      - "{{.DEV_RUNNER}} validate-pyproject pyproject.toml"
+      - $( ! $( $(test "{{.REUSE_ENABLED}}" = "enabled") && [[ $(ls -1
+        requirements*.txt **/requirements*.txt 2>/dev/null | wc -l) > 0 ]] ) )
 
   lint:
     desc: Perform static code analysis.
@@ -123,6 +120,12 @@ tasks:
       - task: check-reuse
 
   check-reuse:
+    vars:
+      REUSE_ENABLED:
+        sh:
+          "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
+          tool.taskfile.reuse"
+
     cmds:
       # add any missing copyrights
       - 'git diff --name-only --cached | xargs -I {} {{.DEV_RUNNER}} reuse
@@ -141,12 +144,17 @@ tasks:
   execute-pre-commit:
     # [private] internal task for running the pre-commit utility directly and conditionally skipping reuse hook
     vars:
+      REUSE_ENABLED:
+        sh:
+          "{{.DEV_RUNNER}} toml get --toml-path pyproject.toml
+          tool.taskfile.reuse"
+
       SKIP:
         sh:
           if test "{{.REUSE_ENABLED}}" = "disabled"; then echo "reuse"; else
           echo ""; fi
     cmds:
-      - SKIP="{{.SKIP}}" pre-commit run --all-files || True
+      - SKIP="{{.SKIP}}" pre-commit run --all-files || true
 
   build:
     desc: Build the project.
@@ -166,7 +174,7 @@ tasks:
       # check that code can be committed to vcs
       - task: execute-pre-commit
       # create dist packages
-      - task: fe:make_dist_packages
+      - task: fe:make-dist-packages
       # install current build into dev virtual environment
       - task: fe:update-venv
       # check licenses
@@ -197,8 +205,8 @@ tasks:
       - bash -c "mkdir -p metrics"
       - "{{.METRICS_RUNNER}} radon cc --show-complexity --json --min=A
         --output-file=metrics/code-complexity.json src/"
-      - "cat metrics/code-complexity.json |
-        {{.METRICS_RUNNER}} python3 scripts/metrics_cc_filter.py | head -n 20"
+      - "cat metrics/code-complexity.json | {{.METRICS_RUNNER}} python3
+        scripts/metrics_cc_filter.py | head -n 20"
       - "{{.METRICS_RUNNER}} radon hal --json
         --output-file=metrics/halstead-metrics.json src/"
       - "{{.METRICS_RUNNER}} radon mi --json
@@ -231,7 +239,8 @@ tasks:
   clean:
     desc: Remove virtual environments and generated files.
     cmds:
-      - task: fe:env_prune
+      - pre-commit clean
+      - task: fe:env-prune
       - rm -rf .tox
       - rm -rf .nox
       - rm -rf dist
@@ -244,36 +253,48 @@ tasks:
       - rm -f requirements/requirements*.txt
       - rm -f requirements/requirements*.txt.license
       - rm -f poetry.lock
+      - task: deactivate
+
+  deactivate:
+    # [private] if a virtual environment is active, deactivate it.
+    cmds:
+      - source .venv/bin/deactivate 2>/dev/null || true
 
   switch-to-hatch:
     desc: Switch development to use hatch.
     cmds:
       - "{{.DEV_RUNNER}} python3 scripts/swap_build_system.py hatch"
       - task: clean
-      - rm -f taskfiles/front-end.yaml
+      - rm -f taskfiles/front-end.yaml taskfiles/front-end-vars.yaml
       - ln -s hatch.yaml taskfiles/front-end.yaml
-      - task: fe:hatch-show-env
+      - ln -s hatch-vars.yaml taskfiles/front-end-vars.yaml
+      - task: hatch:make-env
+      - task: hatch:update-venv
+      - task: hatch:show-env
 
   switch-to-poetry:
     desc: Switch development to use poetry.
     cmds:
       - "{{.DEV_RUNNER}} python3 scripts/swap_build_system.py poetry"
       - task: clean
-      - rm -f taskfiles/front-end.yaml
+      - rm -f taskfiles/front-end.yaml taskfiles/front-end-vars.yaml
       - ln -s poetry.yaml taskfiles/front-end.yaml
-      - poetry config virtualenvs.in-project true
-      - poetry lock
-      - poetry install
-      - task: fe:poetry-show-env
+      - ln -s poetry-vars.yaml taskfiles/front-end-vars.yaml
+      - task: poetry:make-env
+      - task: poetry:update-venv
+      - task: poetry:show-env
 
   switch-to-setuptools:
     desc: Switch development to use setuptools.
     cmds:
       - "{{.DEV_RUNNER}} python3 scripts/swap_build_system.py setuptools"
-      - rm -f taskfiles/front-end.yaml
+      - rm -f taskfiles/front-end.yaml taskfiles/front-end-vars.yaml
       - ln -s setuptools.yaml taskfiles/front-end.yaml
+      - ln -s setuptools-vars.yaml taskfiles/front-end-vars.yaml
       - task: clean
-      - task: fe:setuptools-show-env
+      - task: setuptools:make-env
+      - task: setuptools:update-venv
+      - task: setuptools:show-env
 
   main:
     desc:
