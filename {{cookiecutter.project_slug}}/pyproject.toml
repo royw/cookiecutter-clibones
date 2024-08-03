@@ -125,6 +125,7 @@ dependencies = [
 # strings. The strings of the arrays must be valid PEP 508 strings. The keys MUST be valid values for
 # Provides-Extra. Each value in the array thus becomes a corresponding Requires-Dist entry for the matching
 # Provides-Extra metadata.
+
 [project.optional-dependencies]
 dev = [
   "blacken-docs<2.0.0,>=1.18.0",
@@ -649,6 +650,55 @@ myst-parser = "^3.0.1"
 sphinx = "^7.3.7"
 sphinx-copybutton = "^0.5.2"
 sphinx-autodoc-typehints = "^2.1.1"
+
+[tool.poetry.extras]
+dev = [
+  "blacken-docs",
+  "build",
+  "fawltydeps",
+  "flict",
+  "liccheck",
+  "mypy",
+  "pre-commit",
+  "pytest",
+  "pytest-cov",
+  "pyupgrade",
+  "reuse",
+  "ruff",
+  "shellcheck-py",
+  "toml-cli",
+  "tomlkit",
+  "tox",
+  "validate-pyproject",
+  "httpx",
+  "pip-tools",
+  "check-pyproject"
+]
+test = [
+  "coverage",
+  "pytest",
+  "pytest-cov",
+  "tomlkit"
+]
+metrics = [
+  "radon"
+]
+docs = [
+  "mkdocs",
+  "mkdocstrings-python",
+  "mkdocs-gen-files",
+  "mkdocs-literate-nav",
+  "mkdocs-material",
+  "mkdocs-section-index",
+  "mkdocstrings"
+]
+sphinx = [
+  "furo",
+  "myst-parser",
+  "sphinx",
+  "sphinx-copybutton",
+  "sphinx-autodoc-typehints"
+]
 
 [tool.poetry.scripts]
 main = "{{cookiecutter.project_slug}}.__main__:main"
