@@ -5,8 +5,12 @@
 # ref: https://packaging.python.org/en/latest/specifications/pyproject-toml
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+# defaults to using Hatch.
+# Run "task switch-to-poetry" or "task switch-to-setuptools" to change as
+# taskfiles/front-end*.yaml symbolic links need to be kept in sync with
+# these values.
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 # TOML type: string
