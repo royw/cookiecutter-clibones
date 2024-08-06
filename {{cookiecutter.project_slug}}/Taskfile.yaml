@@ -199,6 +199,21 @@ tasks:
     cmds:
       - "{{.DEFAULT_RUNNER}} python3 -m check_pyproject --version"
 
+  pypi-version:
+    desc:
+      Get the current version of the given package(s) from pypi and output as
+      PEP508 dependency specifier(s).
+    summary: |
+      Get the current version of the given package(s) from pypi and output as PEP508 dependency specifier(s).
+      Example usage:
+      ➤ task pypi_version -- httpx tomlkit
+      task: [pypi_version] scripts/latest_pypi_version.sh httpx tomlkit
+      httpx>=0.27.0
+      tomlkit>=0.13.0
+
+    cmds:
+      - "scripts/latest_pypi_version.sh {{.CLI_ARGS}}"
+
   metrics:
     desc: Analyze the code.
     cmds:
