@@ -5,18 +5,18 @@
 version: "3"
 
 vars:
-  SETUPTOOLS_RUNNER: scripts/venv_runner.sh
-  SETUPTOOLS_DEV_RUNNER: "{{.SETUPTOOLS_RUNNER}}"
-  SETUPTOOLS_DOCS_RUNNER: "{{.SETUPTOOLS_RUNNER}}"
-  SETUPTOOLS_TEST_RUNNER: "{{.SETUPTOOLS_RUNNER}}"
-  SETUPTOOLS_METRICS_RUNNER: "{{.SETUPTOOLS_RUNNER}}"
-  SETUPTOOLS_SPHINX_RUNNER: "{{.SETUPTOOLS_RUNNER}}"
+  DEFAULT_RUNNER: scripts/venv_runner.sh
+  DEV_RUNNER: scripts/venv_runner.sh
+  DOCS_RUNNER: scripts/venv_runner.sh
+  TEST_RUNNER: scripts/venv_runner.sh
+  METRICS_RUNNER: scripts/venv_runner.sh
+  SPHINX_RUNNER: scripts/venv_runner.sh
 
 tasks:
-  make-dist-packages:
+  build:
     # [private] build dist packages
     cmds:
-      - "{{.SETUPTOOLS_DEV_RUNNER}} python -m build"
+      - "{{.DEV_RUNNER}} python -m build"
 
   env-prune:
     # [private] remove development environment (i.e. virtual environments)
@@ -32,7 +32,7 @@ tasks:
     silent: true
 
   make-env:
-    desc: create virtual environment
+    # create virtual environment
     vars:
       PYTHON_VERSION:
         # if the .python-version exists, use the highest version from that file (truncated to Major.Minor), else use "3.12"
@@ -48,17 +48,28 @@ tasks:
       # run if the .venv directory does not exist
       - test -d .venv
 
-  unit-tests:
+  unit-test:
     # [private] Run the unit tests for the supported versions of python.
     cmds:
       # hatch supports matrix testing for multiple python coverage
-      - "{{.SETUPTOOLS_TEST_RUNNER}} pytest tests"
-      - "{{.SETUPTOOLS_TEST_RUNNER}} tox"
+      - "{{.TEST_RUNNER}} pytest tests"
+      - "{{.TEST_RUNNER}} tox"
 
-  update-venv:
+  update-env:
+    # [private] Update virtual environment
     cmds:
       - task: make-env
       # [private] update development virtual environment
-      - "{{.SETUPTOOLS_RUNNER}} pip install --upgrade pip"
+      - "{{.DEFAULT_RUNNER}} pip install --upgrade pip"
       # install project into virtual environment
-      - "{{.SETUPTOOLS_RUNNER}} pip install -e .[dev,test,docs,metrics]"
+      - "{{.DEFAULT_RUNNER}} pip install -e .[dev,test,docs,metrics]"
+
+  lockfiles-enable:
+    # Enable backend to use requirements.txt files managed by pip-compile as lock files.
+    cmds:
+      - echo "Not implemented"
+
+  lockfiles-disable:
+    # [private] Disable backend to use requirements.txt files managed by pip-compile as lock files.
+    cmds:
+      - echo "Not implemented"

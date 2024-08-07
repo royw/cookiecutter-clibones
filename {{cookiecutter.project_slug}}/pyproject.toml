@@ -121,7 +121,8 @@ scripts = {'main' = "{{cookiecutter.project_slug}}.__main__:main"}
 # Also note a different grammar is required for version specification
 dependencies = [
   "loguru>=0.7.2, <0.8.0",
-  "pathvalidate>=3.2.0, <4.0.0",
+  "pathvalidate<4.0.0,>=3.2.0",
+  "tomlkit<0.13.0,>=0.12.5",
 ]
 
 # TOML type: a table with values of arrays of PEP 508 strings (optional-dependencies)
@@ -129,7 +130,6 @@ dependencies = [
 # strings. The strings of the arrays must be valid PEP 508 strings. The keys MUST be valid values for
 # Provides-Extra. Each value in the array thus becomes a corresponding Requires-Dist entry for the matching
 # Provides-Extra metadata.
-
 [project.optional-dependencies]
 dev = [
   "blacken-docs<2.0.0,>=1.18.0",
@@ -148,7 +148,6 @@ dev = [
   "ruff>=0.4.7,<0.5.0",
   "shellcheck-py<0.11.0,>=0.10.0.1",
   "toml-cli<0.8.0,>=0.7.0",
-  "tomlkit<0.13.0,>=0.12.5",
   "tox<5.0.0,>=4.14.2",
   "validate-pyproject>=0.18.0,<0.19.0",
   "check-pyproject@git+https://github.com/royw/check_pyproject.git",
@@ -157,7 +156,6 @@ test = [
   "coverage[toml]<8.0.0,>=7.5.4",
   "pytest>=8.2.2, <9.0.0",
   "pytest-cov<6.0.0,>=5.0.0",
-  "tomlkit<0.13.0,>=0.12.5",
 ]
 docs = [
   "mkdocs<2.0.0,>=1.6.0",
@@ -603,6 +601,7 @@ include = [
 loguru = "^0.7.2"
 pathvalidate = "^3.2.0"
 python = "^3.11"
+tomlkit = "^0.12.5"
 
 # You can organize your dependencies in groups to manage them in a more granular way.
 [tool.poetry.group.dev.dependencies]
@@ -620,7 +619,6 @@ reuse = "^3.0.2"
 ruff = "^0.4.7"
 shellcheck-py = "^0.10.0.1"
 toml-cli = "^0.7.0"
-tomlkit = "^0.12.5"
 tox = "^4.14.2"
 validate-pyproject = "^0.18"
 httpx = "^0.27.0"
@@ -631,7 +629,6 @@ check-pyproject = {git = "https://github.com/royw/check_pyproject.git"}
 coverage = {extras = ["toml"], version = "^7.5.4"}
 pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
-tomlkit = "^0.12.5"
 
 [tool.poetry.group.metrics.dependencies]
 radon = "^6.0.1"

@@ -5,15 +5,15 @@
 version: "3"
 
 vars:
-  POETRY_RUNNER: poetry run --
-  POETRY_DEV_RUNNER: "{{.POETRY_RUNNER}}"
-  POETRY_DOCS_RUNNER: "{{.POETRY_RUNNER}}"
-  POETRY_TEST_RUNNER: "{{.POETRY_RUNNER}}"
-  POETRY_METRICS_RUNNER: "{{.POETRY_RUNNER}}"
-  POETRY_SPHINX_RUNNER: "{{.POETRY_RUNNER}}"
+  DEFAULT_RUNNER: poetry run --
+  DEV_RUNNER: poetry run --
+  DOCS_RUNNER: poetry run --
+  TEST_RUNNER: poetry run --
+  METRICS_RUNNER: poetry run --
+  SPHINX_RUNNER: poetry run --
 
 tasks:
-  make-dist-packages:
+  build:
     # [private] build dist packages
     cmds:
       - poetry build
@@ -24,11 +24,9 @@ tasks:
       - poetry env remove --all
 
   make-env:
-    desc: create virtual environment
+    # create virtual environment
     cmds:
-      - poetry config virtualenvs.in-project true
-      - poetry lock
-      - poetry install
+      - poetry run -- true
 
   show-env:
     # [private] show env using poetry
@@ -37,17 +35,28 @@ tasks:
       - poetry env list
       - poetry env info
 
-  unit-tests:
+  unit-test:
     # [private] Run the unit tests for the supported versions of python.
     cmds:
       # for poetry, tox is used for multiple python testing
-      - "{{.POETRY_TEST_RUNNER}} pytest tests"
-      - "{{.POETRY_TEST_RUNNER}} tox"
+      - "{{.TEST_RUNNER}} pytest tests"
+      - "{{.TEST_RUNNER}} tox"
 
-  update-venv:
+  update-env:
+    # [private] Update virtual environment
     cmds:
       # [private] update development virtual environment
       - poetry update
-      - "{{.POETRY_DEV_RUNNER}} pip install --upgrade pip"
+      - "{{.DEV_RUNNER}} pip install --upgrade pip"
       # install project into virtual environment
       - poetry install
+
+  lockfiles-enable:
+    # Enable backend to use requirements.txt files managed by pip-compile as lock files.
+    cmds:
+      - echo "Not implemented"
+
+  lockfiles-disable:
+    # [private] Disable backend to use requirements.txt files managed by pip-compile as lock files.
+    cmds:
+      - echo "Not implemented"
