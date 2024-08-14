@@ -26,7 +26,7 @@ def test_main_pyproject() -> None:
 def test_main_version(capsys: CaptureFixture[Any]) -> None:
     assert main(["--version"]) == 0
     captured = capsys.readouterr()
-    assert version("{{cookiecutter.project_slug}}") in captured.err
+    assert version("{{cookiecutter.project_slug}}") in captured.out
 
 
 def test_main_longhelp() -> None:
@@ -47,7 +47,7 @@ def test_main_help(capsys: CaptureFixture[Any]) -> None:
 def test_quiet(capsys: CaptureFixture[Any]) -> None:
     assert main(["--count", "0", "--quiet", "--config", str(tests_dir / "config_2.toml")]) == 0
     captured = capsys.readouterr()
-    assert captured.err == ""
+    assert captured.out == ""
 
 
 def test_invalid_loglevel(capsys: CaptureFixture[Any]) -> None:
@@ -70,35 +70,35 @@ def test_load_config_file_debug(capsys: CaptureFixture[Any]) -> None:
     # with debug=true
     assert main(["--count", "0", "--config", str(tests_dir / "config_1.toml")]) == 0
     captured = capsys.readouterr()
-    assert "'debug': True" in captured.err
+    assert "'debug': True" in captured.out
 
 
 def test_load_config_file_not_debug(capsys: CaptureFixture[Any]) -> None:
     # with debug=false
     assert main(["--count", "0", "--config", str(tests_dir / "config_2.toml")]) == 0
     captured = capsys.readouterr()
-    assert "'debug': False" in captured.err
+    assert "'debug': False" in captured.out
 
 
 def test_load_config_file_loglevel_debug(capsys: CaptureFixture[Any]) -> None:
     # with loglevel=DEBUG
     assert main(["--count", "0", "--config", str(tests_dir / "config_3.toml")]) == 0
     captured = capsys.readouterr()
-    assert "'loglevel': 'DEBUG'" in captured.err
+    assert "'loglevel': 'DEBUG'" in captured.out
 
 
 def test_load_config_file_loglevel_info(capsys: CaptureFixture[Any]) -> None:
     # with loglevel=INFO
     assert main(["--count", "0", "--config", str(tests_dir / "config_4.toml")]) == 0
     captured = capsys.readouterr()
-    assert "'loglevel': 'INFO'" in captured.err
+    assert "'loglevel': 'INFO'" in captured.out
 
 
 def test_debug_flags(capsys: CaptureFixture[Any]) -> None:
     # with debug=true
     assert main(["--count", "0", "--debug"]) == 0
     captured = capsys.readouterr()
-    assert "'debug': True" in captured.err
+    assert "'debug': True" in captured.out
 
 
 def test_debug_flags_false(capsys: CaptureFixture[Any]) -> None:
@@ -113,21 +113,21 @@ def test_debug_flags_false(capsys: CaptureFixture[Any]) -> None:
         == 0
     )
     captured = capsys.readouterr()
-    assert "'debug': False" in captured.err
+    assert "'debug': False" in captured.out
 
 
 def test_debug_flags_debug(capsys: CaptureFixture[Any]) -> None:
     # with --loglevel DEBUG
     assert main(["--count", "0", "--loglevel", "DEBUG"]) == 0
     captured = capsys.readouterr()
-    assert "'loglevel': 'DEBUG'" in captured.err
+    assert "'loglevel': 'DEBUG'" in captured.out
 
 
 def test_debug_flags_info(capsys: CaptureFixture[Any]) -> None:
     # with --loglevel INFO
     assert main(["--count", "0", "--loglevel", "INFO"]) == 0
     captured = capsys.readouterr()
-    assert "'loglevel': 'INFO'" in captured.err
+    assert "'loglevel': 'INFO'" in captured.out
 
 
 def test_save_config_file_as() -> None:
