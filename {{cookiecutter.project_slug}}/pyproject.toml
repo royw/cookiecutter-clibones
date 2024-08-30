@@ -306,6 +306,7 @@ python = ["3.11", "3.12"]
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = [
+  "-n", "auto",
   "-ra", "--showlocals",
   "--strict-markers",
   "--strict-config",
